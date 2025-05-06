@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "luvrn5qu3TY0s16GNWTCFJPaScgEvQXAjdX60jHX8Cg=",
+  "Hash": "KSCI8IoTlR1YBgABl5wmNOhkgtQt8mYvEKme4I1vVlk=",
   "Source": "PaperNest_API",
   "BasePath": "_content/PaperNest_API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

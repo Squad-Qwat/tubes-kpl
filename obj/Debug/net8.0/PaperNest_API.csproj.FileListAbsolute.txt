@@ -31,3 +31,40 @@ G:\MY FILE\ME\TELKOM\SEMESTER 4\KPL\TUBES\tubes-kpl\obj\Debug\net8.0\refint\Pape
 G:\MY FILE\ME\TELKOM\SEMESTER 4\KPL\TUBES\tubes-kpl\obj\Debug\net8.0\PaperNest_API.pdb
 G:\MY FILE\ME\TELKOM\SEMESTER 4\KPL\TUBES\tubes-kpl\obj\Debug\net8.0\PaperNest_API.genruntimeconfig.cache
 G:\MY FILE\ME\TELKOM\SEMESTER 4\KPL\TUBES\tubes-kpl\obj\Debug\net8.0\ref\PaperNest_API.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\appsettings.Development.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\appsettings.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.staticwebassets.endpoints.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.exe
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.deps.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.runtimeconfig.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\PaperNest_API.pdb
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\Microsoft.OpenApi.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.csproj.AssemblyReference.cache
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.GeneratedMSBuildEditorConfig.editorconfig
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.AssemblyInfoInputs.cache
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.AssemblyInfo.cs
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.csproj.CoreCompileInputs.cache
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.MvcApplicationPartsAssemblyInfo.cs
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.MvcApplicationPartsAssemblyInfo.cache
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.sourcelink.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\scopedcss\bundle\PaperNest_API.styles.css
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets.build.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets.development.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets\msbuild.PaperNest_API.Microsoft.AspNetCore.StaticWebAssets.props
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets\msbuild.PaperNest_API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets\msbuild.build.PaperNest_API.props
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.PaperNest_API.props
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.PaperNest_API.props
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets.pack.json
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNes.4A5633C5.Up2Date
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\refint\PaperNest_API.dll
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.pdb
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.genruntimeconfig.cache
+E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\ref\PaperNest_API.dll
