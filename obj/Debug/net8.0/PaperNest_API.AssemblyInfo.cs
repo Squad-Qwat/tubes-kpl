@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be78d08be9523fbc63fe83a98e8c01949631d3ce")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e93a74ec5776153ec1392b521aa7f73b515bb96f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

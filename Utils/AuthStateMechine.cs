@@ -1,4 +1,4 @@
-﻿namespace PaperNest_API
+﻿namespace PaperNest_API.Utils
 {
     class AuthStateMachine
     {
