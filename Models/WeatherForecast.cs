@@ -1,4 +1,4 @@
-namespace PaperNest_API
+namespace PaperNest_API.Models
 {
     public class WeatherForecast
     {

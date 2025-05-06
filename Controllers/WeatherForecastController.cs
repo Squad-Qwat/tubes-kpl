@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PaperNest_API.Models;
 
 namespace PaperNest_API.Controllers;
 
