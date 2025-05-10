@@ -7,7 +7,7 @@ namespace PaperNest_API
     {
         public static void Main(string[] args)
         {
-            ResearchRequestController controller = new ResearchRequestController();
+            ResearchRequestController controller = new(); // Setara dengan 'new ResearchRequestController()'
 
             // Simulate user interactions
             controller.AddRequest("Algoritma Novel untuk Image Recognition", "Makalah ini mengusulkan algoritma baru...", "Dr. Alice Smith");
