@@ -6,28 +6,28 @@ namespace PaperNest_API.Views
     {
         public void DisplayRequestDetails(ResearchRequest request)
         {
-            Console.WriteLine($"Request ID: {request.Id}");
-            Console.WriteLine($"Title: {request.Title}");
-            Console.WriteLine($"Abstract: {request.Abstract}");
-            Console.WriteLine($"Researcher: {request.ResearcherName}");
-            Console.WriteLine($"Submission Date: {request.SubmissionDate}");
+            Console.WriteLine($"ID Permintaan: {request.Id}");
+            Console.WriteLine($"Judul: {request.Title}");
+            Console.WriteLine($"Abstrak: {request.Abstract}");
+            Console.WriteLine($"Periset: {request.ResearcherName}");
+            Console.WriteLine($"Tanggal pengumpulan: {request.SubmissionDate}");
             Console.WriteLine($"Status: {request.State.Name}");
 
             if (request.Reviews.Count > 0)
             {
-                Console.WriteLine("\nReviews:");
+                Console.WriteLine("\nTinjauan:");
                 foreach (var review in request.Reviews)
                 {
-                    Console.WriteLine($"- Review ID: {review.Id}");
-                    Console.WriteLine($"  Reviewer: {review.ReviewerName}");
-                    Console.WriteLine($"  Result: {review.Result}");
-                    Console.WriteLine($"  Comment: {review.Comment}");
-                    Console.WriteLine($"  Date: {review.ReviewDate}");
+                    Console.WriteLine($"- ID tinjauan: {review.Id}");
+                    Console.WriteLine($"- Peninjau: {review.ReviewerName}");
+                    Console.WriteLine($"- Hasil: {review.Result}");
+                    Console.WriteLine($"- Komentar: {review.Comment}");
+                    Console.WriteLine($"- Tanggal: {review.ReviewDate}");
                 }
             }
             else
             {
-                Console.WriteLine("No reviews yet.");
+                Console.WriteLine("Belum ada tinjauan.");
             }
             Console.WriteLine();
         }

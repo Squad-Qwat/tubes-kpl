@@ -14,21 +14,21 @@ namespace PaperNest_API.Controllers
         {
             var newRequest = new ResearchRequest(nextRequestId++, title, abstractText, researcherName);
             requests.Add(newRequest);
-            view.DisplayMessage($"Research request '{newRequest.Title}' submitted successfully with ID: {newRequest.Id}");
+            view.DisplayMessage($"Permintaan riset '{newRequest.Title}' berhasil ditambahkan dengan ID: {newRequest.Id}");
         }
 
-        public ResearchRequest GetRequestById(int id)
+        public ResearchRequest? GetRequestById(int id)
         {
             try
             {
                 if (id <= 0)
                 {
-                    throw new ArgumentNullException(nameof(id), "Request ID must be greater than zero.");
+                    throw new ArgumentNullException(nameof(id), "IS permintaan harus lebih dari 0.");
                 }
-                var request = requests.FirstOrDefault(r => r.Id == id);
+                ResearchRequest? request = requests.FirstOrDefault(r => r.Id == id);
                 if (request == null)
                 {
-                    throw new ArgumentNullException(nameof(request), $"Request with ID: {id} not found.");
+                    throw new ArgumentNullException(nameof(request), $"Permintaan dengan ID: {id} tidak ada.");
                 }
                 // view.DisplayMessage($"Research request '{request.Title}' retrieved successfully.");
                 // view.DisplayRequestDetails(request);
@@ -36,7 +36,7 @@ namespace PaperNest_API.Controllers
             }
             catch (ArgumentNullException ex)
             {
-                view.DisplayMessage($"Error retrieving request with ID: {id}. Exception: {ex.Message}");
+                view.DisplayMessage($"Terjadi kesalahan saat menerima permintaan dengan ID: {id} dengan pesan: {ex.Message}");
                 return null;
             }
         }
@@ -49,16 +49,16 @@ namespace PaperNest_API.Controllers
                 if (request.State is SubmittedState)
                 {
                     request.ChangeState(new UnderReviewState());
-                    view.DisplayMessage($"Research request '{request.Title}' (ID: {request.Id}) is now under review.");
+                    view.DisplayMessage($"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang ditinjau.");
                 }
                 else
                 {
-                    view.DisplayMessage($"Research request '{request.Title}' (ID: {request.Id}) is not in a state to start review. Current state: {request.State.Name}");
+                    view.DisplayMessage($"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang tidak dalam keadaan untuk memulai peninjauan. Keadaan saat ini: {request.State.Name}");
                 }
             }
             else
             {
-                view.DisplayMessage($"Research request with ID: {requestId} not found.");
+                view.DisplayMessage($"Permintaan riset dengan ID: {requestId} tidak ada.");
             }
         }
 
@@ -72,11 +72,11 @@ namespace PaperNest_API.Controllers
             }
             else if (request != null)
             {
-                view.DisplayMessage($"Cannot process review for request '{request.Title}' (ID: {request.Id}) in state: {request.State.Name}");
+                view.DisplayMessage($"Tidak bisa memproses permintaan untuk meninjau '{request.Title}' (ID: {request.Id}) dalam keadaan: {request.State.Name}");
             }
             else
             {
-                view.DisplayMessage($"Research request with ID: {requestId} not found.");
+                view.DisplayMessage($"Permintaan riset dengan ID: {requestId} tidak ada.");
             }
         }
 
@@ -89,7 +89,7 @@ namespace PaperNest_API.Controllers
             }
             else
             {
-                view.DisplayMessage($"Research request with ID: {requestId} not found.");
+                view.DisplayMessage($"Permintaan riset dengan ID: {requestId} tidak ada.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace PaperNest_API.Controllers
         {
             if (requests.Count > 0)
             {
-                Console.WriteLine("--- All Research Requests ---");
+                Console.WriteLine("--- Semua permintaan riset ---");
                 foreach (var request in requests)
                 {
                     view.DisplayRequestDetails(request);
@@ -105,7 +105,7 @@ namespace PaperNest_API.Controllers
             }
             else
             {
-                view.DisplayMessage("No research requests submitted yet.");
+                view.DisplayMessage("Belum ada permintaan riset yang ditambahkan/ diantrikan.");
             }
         }
     }

@@ -11,20 +11,21 @@ namespace PaperNest_API
             CitationController controller = new(); // Setara 'new CitationController()'
             CitationView view = new(); // Setara 'new CitationView()'
 
-            while (true)
+            string choice;
+            do
             {
                 Console.WriteLine("\n--- Bibliography Manager ---");
-                Console.WriteLine("1. List All Citations");
-                Console.WriteLine("2. Show Citation Details");
-                Console.WriteLine("3. Add New Citation");
-                Console.WriteLine("4. Update Citation");
-                Console.WriteLine("5. Delete Citation");
-                Console.WriteLine("6. Generate Bibliography");
-                Console.WriteLine("7. Generate Citation Text (APA Style)");
-                Console.WriteLine("8. Exit");
-                Console.Write("Enter your choice: ");
+                Console.WriteLine("1. Isi semua sitasi");
+                Console.WriteLine("2. Menampilkan detil sitasi");
+                Console.WriteLine("3. Tambah sitasi baru");
+                Console.WriteLine("4. Memperbarui sitasi");
+                Console.WriteLine("5. Menghapus sitasi");
+                Console.WriteLine("6. Membuat Bibliografi");
+                Console.WriteLine("7. Membuat teks sitasi (Jenis APA)");
+                Console.WriteLine("8. Keluar");
+                Console.Write("Masukkan pilihanmu: ");
 
-                string choice = Console.ReadLine();
+                choice = Console.ReadLine();
 
                 switch (choice)
                 {
@@ -33,7 +34,7 @@ namespace PaperNest_API
                         view.DisplayBibliography(allCitations);
                         break;
                     case "2":
-                        Console.Write("Enter the ID of the citation to show details: ");
+                        Console.Write("Masukkan ID sitasi untuk menampilkan detil: ");
                         if (int.TryParse(Console.ReadLine(), out int showId))
                         {
                             var citation = controller.GetCitation(showId);
@@ -43,87 +44,87 @@ namespace PaperNest_API
                             }
                             else
                             {
-                                Console.WriteLine($"Citation with ID {showId} not found.");
+                                Console.WriteLine($"Sitasi dengan ID {showId} tidak ada.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid ID.");
+                            Console.WriteLine("ID tidak valid.");
                         }
                         break;
                     case "3":
-                        Console.WriteLine("Enter details for the new citation:");
-                        Console.Write("Type (Book, JournalArticle, Website, ConferencePaper, Thesis): ");
+                        Console.WriteLine("Masukkan detil pada sitasi baru:");
+                        Console.Write("Tipe (Buku, Article jurnal, Website, makalah konferensi, Tesis): ");
                         if (Enum.TryParse<CitationType>(Console.ReadLine(), out CitationType newType))
                         {
-                            Console.Write("Title: ");
+                            Console.Write("Judul: ");
                             string newTitle = Console.ReadLine();
-                            Console.Write("Author: ");
+                            Console.Write("Pengarang: ");
                             string newAuthor = Console.ReadLine();
-                            Console.Write("Publication Info: ");
+                            Console.Write("Info publikasi: ");
                             string newPublicationInfo = Console.ReadLine();
 
                             controller.AddCitation(newType, newTitle, newAuthor, newPublicationInfo);
-                            Console.WriteLine("Citation added successfully.");
+                            Console.WriteLine("sitasi berhasil ditambahkan.");
                         }
                         else
                         {
-                            Console.WriteLine("Invalid citation type.");
+                            Console.WriteLine("Tipe sitasi tidak valid.");
                         }
                         break;
                     case "4":
-                        Console.Write("Enter the ID of the citation to update: ");
+                        Console.Write("Masukkan ID sitasi yang akan diperbarui: ");
                         if (int.TryParse(Console.ReadLine(), out int updateId))
                         {
                             var existingCitation = controller.GetCitation(updateId);
                             if (existingCitation != null)
                             {
-                                Console.WriteLine("Enter new details (leave blank to keep current):");
-                                Console.Write($"New Type ({existingCitation.Type}): ");
+                                Console.WriteLine("Masukkan detil baru (Biarkan kosong untuk tidak mengubahnya):");
+                                Console.Write($"Tipe baru ({existingCitation.Type}): ");
                                 string? typeInput = Console.ReadLine();
                                 CitationType? updatedType = string.IsNullOrEmpty(typeInput) ? existingCitation.Type : Enum.Parse<CitationType>(typeInput);
 
-                                Console.Write($"New Title ({existingCitation.Title}): ");
+                                Console.Write($"Judul baru ({existingCitation.Title}): ");
                                 string? updatedTitle = string.IsNullOrEmpty(Console.ReadLine()) ? existingCitation.Title : Console.ReadLine();
 
-                                Console.Write($"New Author ({existingCitation.Author}): ");
+                                Console.Write($"Pengarang baru ({existingCitation.Author}): ");
                                 string? updatedAuthor = string.IsNullOrEmpty(Console.ReadLine()) ? existingCitation.Author : Console.ReadLine();
 
-                                Console.Write($"New Publication Info ({existingCitation.PublicationInfo}): ");
+                                Console.Write($"Info publikasi baru ({existingCitation.PublicationInfo}): ");
                                 string? updatedPublicationInfo = string.IsNullOrEmpty(Console.ReadLine()) ? existingCitation.PublicationInfo : Console.ReadLine();
 
-                                Console.Write($"New Publication Date (yyyy-mm-dd) ({existingCitation.PublicationDate?.ToShortDateString() ?? "N/A"}): ");
+                                Console.Write($"Tanggal publikasi baru (yyyy-mm-dd) ({existingCitation.PublicationDate?.ToShortDateString() ?? "N/A"}): ");
                                 DateTime? updatedPublicationDate = DateTime.TryParse(Console.ReadLine(), out DateTime date) ? date : existingCitation.PublicationDate;
 
-                                Console.Write($"New Access Date ({existingCitation.AccessDate ?? "N/A"}): ");
+                                Console.Write($"Tanggal akses baru ({existingCitation.AccessDate ?? "N/A"}): ");
                                 string? updatedAccessDate = string.IsNullOrEmpty(Console.ReadLine()) ? existingCitation.AccessDate : Console.ReadLine();
 
-                                Console.Write($"New DOI ({existingCitation.DOI ?? "N/A"}): ");
+                                Console.Write($"DOI baru ({existingCitation.DOI ?? "N/A"}): ");
                                 string? updatedDOI = string.IsNullOrEmpty(Console.ReadLine()) ? existingCitation.DOI : Console.ReadLine();
 
                                 controller.UpdateCitation(updateId, updatedType, updatedTitle, updatedAuthor, updatedPublicationInfo, updatedPublicationDate, updatedAccessDate, updatedDOI);
-                                Console.WriteLine("Citation updated successfully.");
+                                Console.WriteLine("Sitasi berhasil ditambahkan.");
                             }
                             else
                             {
-                                Console.WriteLine($"Citation with ID {updateId} not found.");
+                                Console.WriteLine($"Sitasi dengan ID {updateId} tidak ada.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid ID.");
+                            Console.WriteLine("ID tidak valid.");
                         }
                         break;
                     case "5":
-                        Console.Write("Enter the ID of the citation to delete: ");
+                        Console.Write("Masukkan ID sitasi yang akan dihapus: ");
                         if (int.TryParse(Console.ReadLine(), out int deleteId))
                         {
                             controller.DeleteCitation(deleteId);
-                            Console.WriteLine($"Citation with ID {deleteId} deleted.");
+                            Console.WriteLine($"Sitasi dengan ID {deleteId} dihapus.");
                         }
                         else
                         {
-                            Console.WriteLine("Invalid ID.");
+                            Console.WriteLine("ID tidak valid.");
                         }
                         break;
                     case "6":
@@ -131,7 +132,7 @@ namespace PaperNest_API
                         view.DisplayBibliography(bibliography);
                         break;
                     case "7":
-                        Console.Write("Enter the ID of the citation to generate APA style text: ");
+                        Console.Write("Masukkan ID sitasi untuk membuat teks jenis APA: ");
                         if (int.TryParse(Console.ReadLine(), out int citationId))
                         {
                             string citationText = controller.GenerateCitationText(citationId);
@@ -139,17 +140,17 @@ namespace PaperNest_API
                         }
                         else
                         {
-                            Console.WriteLine("Invalid ID.");
+                            Console.WriteLine("ID tidak valid.");
                         }
                         break;
                     case "8":
-                        Console.WriteLine("Exiting Bibliography Manager.");
+                        Console.WriteLine("Keluar dari Bibliography Manager....");
                         return;
                     default:
-                        Console.WriteLine("Invalid choice. Please try again.");
+                        Console.WriteLine("Pilihan tidak valid, silahkan coba lagi.");
                         break;
                 }
-            }
+            } while (choice != "8");
         }
     }
 }

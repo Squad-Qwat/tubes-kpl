@@ -22,7 +22,7 @@
         {
             if (result != ReviewResult.Pending)
             {
-                Console.WriteLine($"Error: Cannot directly set to {result} from {Name}. Requires review first.");
+                Console.WriteLine($"Error: Tidak bisa secara langsung diubah ke {result} dari {Name}. Perlu ditinjau terlebih dahulu.");
             }
         }
     }
@@ -33,7 +33,7 @@
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
             var reviewId = request.Reviews.Count + 1;
-            request.AddReview(new Review(reviewId, request.Id, "Reviewer", result, reviewerComment));
+            request.AddReview(new Review(reviewId, request.Id, "Peninjau", result, reviewerComment));
 
             switch (result)
             {
@@ -47,7 +47,7 @@
                     request.ChangeState(new NeedsRevisionState());
                     break;
                 default:
-                    Console.WriteLine("Review result is still pending.");
+                    Console.WriteLine("Hasil tinjauan masih dipertimbangkan.");
                     break;
             }
         }
@@ -57,7 +57,7 @@
         public string Name => "Approved";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            Console.WriteLine("Research request is already approved.");
+            Console.WriteLine("Menyetujui permintaan peninjauan.");
         }
     }
 
@@ -66,7 +66,7 @@
         public string Name => "Rejected";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            Console.WriteLine("Research request is already rejected.");
+            Console.WriteLine("Permintaan peninjauan ditolak");
         }
     }
 
@@ -85,7 +85,7 @@
             }
             else
             {
-                Console.WriteLine($"Research request is still under revision or received another review result: {result}");
+                Console.WriteLine($"Permintaan peninjauan masih direvisi atau sudah menerima hasil tinjauan lain: {result}");
             }
         }
     }

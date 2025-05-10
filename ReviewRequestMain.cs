@@ -7,20 +7,20 @@ namespace PaperNest_API
     {
         public static void Main(string[] args)
         {
-            var controller = new ResearchRequestController();
+            ResearchRequestController controller = new ResearchRequestController();
 
             // Simulate user interactions
-            controller.AddRequest("Novel Algorithm for Image Recognition", "This paper proposes a new algorithm...", "Dr. Alice Smith");
-            controller.AddRequest("Impact of Climate Change on Coastal Ecosystems", "An investigation into...", "Prof. Bob Johnson");
+            controller.AddRequest("Algoritma Novel untuk Image Recognition", "Makalah ini mengusulkan algoritma baru...", "Dr. Alice Smith");
+            controller.AddRequest("Dampak perubahan iklim pada ekosistem pesisir", "Sebuah investigasi mengenai...", "Prof. Bob Johnson");
 
             controller.DisplayAllRequests();
 
             controller.StartReview(1);
-            controller.ProcessReview(1, ReviewResult.Approved, "Excellent work!");
+            controller.ProcessReview(1, ReviewResult.Approved, "Kerja bagus!");
 
             controller.StartReview(2);
-            controller.ProcessReview(2, ReviewResult.NeedsRevision, "Please elaborate on the methodology.");
-            controller.ProcessReview(2, ReviewResult.Approved, "Revisions addressed the concerns.");
+            controller.ProcessReview(2, ReviewResult.NeedsRevision, "Tolong jelaskan metodologinya.");
+            controller.ProcessReview(2, ReviewResult.Approved, "Revisi telah menyelesaikan permasalahannya.");
 
             controller.DisplayAllRequests();
         }

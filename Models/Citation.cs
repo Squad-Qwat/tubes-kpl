@@ -29,22 +29,22 @@ namespace PaperNest_API.Models
             switch (Type)
             {
                 case CitationType.Book:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). {Title}. {PublicationInfo}.";
+                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}.";
                     break;
                 case CitationType.JournalArticle:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). {Title}. {PublicationInfo}.";
+                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. *{PublicationInfo}*.";
                     break;
                 case CitationType.Website:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). {Title}. {PublicationInfo}. Retrieved from {AccessDate}";
+                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}. Diakses dari {AccessDate}";
                     break;
                 case CitationType.ConferencePaper:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). {Title}. In {PublicationInfo}.";
+                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. In *{PublicationInfo}*.";
                     break;
                 case CitationType.Thesis:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). {Title}. {PublicationInfo}.";
+                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}.";
                     break;
                 default:
-                    apaString = "Citation format not supported.";
+                    apaString = "Format sitasi tidak didukung.";
                     break;
             }
             return apaString;

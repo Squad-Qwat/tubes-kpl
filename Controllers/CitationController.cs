@@ -32,7 +32,7 @@ namespace PaperNest_API.Controllers
                     bibliography.Add(entry);
                 }
             },
-            { CitationType.ConferencePaper, (citation, bibliography) =>
+             { CitationType.ConferencePaper, (citation, bibliography) =>
                 {
                     string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. In {citation.PublicationInfo}.";
                     bibliography.Add(entry);
@@ -54,13 +54,16 @@ namespace PaperNest_API.Controllers
             return newCitation.Id;
         }
 
-        public Citation GetCitation(int id)
+        public Citation? GetCitation(int id)
         {
-            if (_citations.TryGetValue(id, out var citation))
-            {
-                return citation;
-            }
-            return null;
+            return _citations.TryGetValue(id, out var citation) ? citation : null;
+            /* Setara dengan:
+             * if (_citations.TryGetValue(id, out var citation))
+             * {
+             *    return citation;
+             * }
+             * return null;
+            */
         }
 
         public void UpdateCitation(int id, CitationType? type = null, string title = null, string author = null, string publicationInfo = null, DateTime? publicationDate = null, string accessDate = null, string doi = null)
@@ -80,7 +83,22 @@ namespace PaperNest_API.Controllers
 
         public void DeleteCitation(int id)
         {
-            _citations.Remove(id);
+            try
+            {
+                if (_citations.ContainsKey(id))
+                {
+                    _citations.Remove(id);
+                    Console.WriteLine($"Sitasi dengan ID {id} berhasil dihapus.");
+                }
+                else
+                {
+                    throw new Exception($"Sitasi dengan ID {id} tidak ada.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Terjadi kesalahan saat menghapus sitasi: {ex.Message}");
+            }
         }
 
         public List<string> GenerateBibliography()
@@ -95,7 +113,7 @@ namespace PaperNest_API.Controllers
                 }
                 else
                 {
-                    bibliography.Add($"Citation format not supported for type: {citation.Type}"); // error
+                    bibliography.Add($"Format sitasi tidak didukung untuk tipe: {citation.Type}"); // error
                 }
             }
             return bibliography;
@@ -104,11 +122,15 @@ namespace PaperNest_API.Controllers
         public string GenerateCitationText(int citationId)
         {
             var citation = GetCitation(citationId);
-            if (citation == null)
-            {
-                return "Citation not found";
-            }
-            return citation.GenerateAPAStyle();
+            return (citation == null) ? "Sitasi tidak ada" : citation.GenerateAPAStyle();
+            /*
+             * Setara dengan:
+             * if(citation == null) 
+             * {
+             *    return "Sitasi tidak ada";
+             * }
+             * return citation.GenerateAPAStyle();
+            */
         }
     }
 }
