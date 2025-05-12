@@ -9,19 +9,23 @@ namespace PaperNest_API.Models
         public Guid Id { get; private set; } = Guid.NewGuid();
 
         [Required, MaxLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
         [Required]
         public Guid User_id { get; set; }
-
-        public bool Is_public { get; set; }
+        
+        [ForeignKey("User_id")]
+        public virtual User User { get; set; } = null!;
 
         public DateTime Created_at { get; private set; } = DateTime.Now;
 
         public DateTime Updated_at { get; set; }
 
-        public ICollection<Document> Documents { get; set; } = new List<Document>();
+        public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
+        
+        // Koleksi untuk UserWorkspace
+        public virtual ICollection<UserWorkspace> UserWorkspaces { get; set; } = new List<UserWorkspace>();
     }
 }

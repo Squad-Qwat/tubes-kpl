@@ -2,17 +2,29 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace PaperNest_API.Models
 {
     public class ResearchRequest
     {
-        public int Id { get; }
+        [Key]
+        public int Id { get; private set; }
+        
+        [Required]
         public string Title { get; set; }
+        
+        [Required]
         public string Abstract { get; set; }
+        
+        [Required]
         public string ResearcherName { get; set; }
-        public DateTime SubmissionDate { get; }
+        
+        public DateTime SubmissionDate { get; private set; }
+        
         public ReviewState State { get; private set; }
-        public List<Review> Reviews { get; private set; } = new List<Review>();
+        
+        public virtual List<Review> Reviews { get; private set; } = new List<Review>();
 
         public ResearchRequest(int id, string title, string abstractText, string researcherName)
         {

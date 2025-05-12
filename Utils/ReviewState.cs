@@ -35,16 +35,13 @@ namespace PaperNest_API.Models
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            var reviewId = request.Reviews.Count + 1;
-            request.AddReview(new Review(reviewId, request.Id, "Reviewer", result, reviewerComment));
+            // Using the correct constructor from Review model
+            request.AddReview(new Review(request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
             {
                 case ReviewResult.Approved:
                     request.ChangeState(new ApprovedState());
-                    break;
-                case ReviewResult.Rejected:
-                    request.ChangeState(new RejectedState());
                     break;
                 case ReviewResult.NeedsRevision:
                     request.ChangeState(new NeedsRevisionState());
@@ -64,15 +61,6 @@ namespace PaperNest_API.Models
         }
     }
 
-    public class RejectedState : ReviewState
-    {
-        public string Name => "Rejected";
-        public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {
-            Console.WriteLine("Research request is already rejected.");
-        }
-    }
-
     public class NeedsRevisionState : ReviewState
     {
         public string Name => "Needs Revision";
@@ -81,10 +69,6 @@ namespace PaperNest_API.Models
             if (result == ReviewResult.Approved)
             {
                 request.ChangeState(new ApprovedState());
-            }
-            else if (result == ReviewResult.Rejected)
-            {
-                request.ChangeState(new RejectedState());
             }
             else
             {

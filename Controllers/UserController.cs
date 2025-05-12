@@ -1,46 +1,68 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PaperNest_API.Models;
-using PaperNest_API.Repository;
+using PaperNest_API.Services;
 
 namespace PaperNest_API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("/api/users")]
     public class UserController : Controller
     {
-            [HttpPost("register")]
-            public IActionResult Register([FromBody] User user)
-            {
-                var user_obj = new User
-                {
-                    Name = user.Name,
-                    Email = user.Email,
-                    Password = user.Password,
-                    Username = user.Username,
-                    Role = "Mahasiswa" ?? "Dosen"
-                };
-
-                UserRepository.userRepository.Add(user);
-
-                return Ok(new
-                {
-                    message = "Berhasil register user dengan id" + user.Id
-                });
-            }
-
-        [HttpGet("login")]
-        public IActionResult Login(string username, string password)
+        [HttpGet]
+        public IActionResult GetAllUser()
         {
-            var user = UserRepository.userRepository.FirstOrDefault(u => u.Username.Equals(username) && u.Password.Equals(password));
+            var user = UserService.GetAll();
+
+            return Ok(new
+            {
+                message = "Berhasil mendapatkan data user",
+                data = user
+            });
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetUserById(Guid id)
+        {
+            var user = UserService.GetById(id);
 
             if (user == null)
             {
-                return Unauthorized("Email atau password salah");
+                return NotFound();
             }
 
             return Ok(new
             {
-                message = "Berhasil login user dengan id" + user.Id
+                message = "Berhasil mendapatkan data user dengan id " + user.Id,
+                data = user
+            });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateUser(Guid id, [FromBody] User user)
+        {
+            var existingUser = UserService.GetById(id);
+
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+
+            existingUser.Name = user.Name;
+            existingUser.Username = user.Username;
+
+            return Ok(new
+            {
+                message = "Berhasil memperbarui data user dengan id " + existingUser.Id
+            });
+        }
+
+        [HttpDelete("id")]
+        public IActionResult DeleteUser(Guid id)
+        {
+            UserService.Delete(id);
+
+            return Ok(new
+            {
+                message = "Berhasil menghapus user dengan id " + id
             });
         }
     }
