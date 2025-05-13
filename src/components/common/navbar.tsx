@@ -19,7 +19,7 @@ function Navbar() {
             <Link
               to="/"
               aria-label="home"
-              className="flex items-center space-x-2 text-2xl font-black text-primary font-sans uppercase"
+              className="flex items-center space-x-2 text-2xl font-black text-foreground font-sans uppercase"
             >
               PaperNest
             </Link>
@@ -27,20 +27,20 @@ function Navbar() {
             <button
               onClick={() => setMenuState(!menuState)}
               aria-label={menuState == true ? 'Close Menu' : 'Open Menu'}
-              className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
+              className="relative border rounded-full z-20 -m-2.5 -mr-4 block cursor-pointer p-1.5 lg:hidden"
             >
-              <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-              <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+              <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-5 duration-200" />
+              <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-5 -rotate-180 scale-0 opacity-0 duration-200" />
             </button>
           </div>
 
           <div className="hidden lg:block">
-            <ul className="flex  gap-8 text-sm">
+            <ul className="flex gap-8 text-sm">
               {navMenuItems.map((item, index) => (
                 <li key={index}>
                   <Link
                     to={item.href}
-                    className="text-foreground hover:text-primary block hover:underline font-mono duration-150 uppercase"
+                    className="text-foreground hover:text-primary block hover:underline duration-150"
                   >
                     <span>{item.name}</span>
                   </Link>
@@ -56,7 +56,7 @@ function Navbar() {
                   <li key={index}>
                     <Link
                       to={item.href}
-                      className="text-foreground hover:text-primary block hover:underline font-mono duration-150 uppercase"
+                      className="text-foreground hover:text-primary block hover:underline duration-150"
                     >
                       <span>{item.name}</span>
                     </Link>

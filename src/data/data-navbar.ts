@@ -21,6 +21,13 @@ const navMenuItems = [
   },
 
   {
+    name: 'Learn',
+    href: '/learn',
+    icon: '',
+    target: '',
+  },
+
+  {
     name: 'Blog',
     href: '/blog',
     icon: '',
