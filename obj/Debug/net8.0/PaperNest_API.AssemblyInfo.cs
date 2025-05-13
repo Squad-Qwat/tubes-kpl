@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("7ede4d19-adf3-4f31-9694-3d3b2a387224")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cb15bae7248d351e4b468e52e009be68658ce7f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a697ff35dff8732ff62fd58f93e00c52e21a631b")]
 [assembly: System.Reflection.AssemblyProductAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PaperNest_API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

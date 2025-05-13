@@ -2,6 +2,7 @@
 {
     public enum ReviewResult
     {
+        Unsubmited,
         Pending,
         Approved,
         Rejected,
