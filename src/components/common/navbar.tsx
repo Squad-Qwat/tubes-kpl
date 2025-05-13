@@ -69,12 +69,12 @@ function Navbar() {
 
             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit font-mono tracking-tight">
               <Button asChild variant="outline" size="default">
-                <Link to="#">
+                <Link to="/auth/signin">
                   <span>Sign in</span>
                 </Link>
               </Button>
               <Button asChild size="default">
-                <Link to="#">
+                <Link to="/auth/signup">
                   <span>Create Account</span>
                 </Link>
               </Button>
