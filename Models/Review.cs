@@ -1,22 +1,38 @@
-﻿namespace PaperNest_API.Models
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PaperNest_API.Models
 {
     public class Review
     {
-        public int Id { get; }
-        public int ResearchRequestId { get; }
-        public string ReviewerName { get; }
-        public ReviewResult Result { get; }
-        public string Comment { get; }
-        public DateTime ReviewDate { get; }
+        [Key]
+        public Guid Id { get; private set; } = Guid.NewGuid(); 
 
-        public Review(int id, int researchRequestId, string reviewerName, ReviewResult result, string comment)
+        public int ResearchRequestId { get; private set; }
+        public string ReviewerName { get; private set; }
+        public ReviewResult Result { get; private set; }
+        public string Comment { get; private set; }
+        public DateTime ReviewDate { get; private set; }
+
+        
+        public Review(int researchRequestId, string reviewerName, ReviewResult result, string comment)
         {
-            Id = id;
             ResearchRequestId = researchRequestId;
             ReviewerName = reviewerName;
             Result = result;
             Comment = comment;
             ReviewDate = DateTime.Now;
         }
+
+        public Review(int id, int researchRequestId, string reviewerName, ReviewResult result, string comment) :
+            this(researchRequestId, reviewerName, result, comment)
+        {
+        }
+
+        [ForeignKey("ResearchRequestId")]
+        public virtual ResearchRequest ResearchRequest { get; private set; } = null!;
+
+        public virtual ICollection<DocumentBody> DocumentBodies { get; set; } = new List<DocumentBody>();
     }
 }
