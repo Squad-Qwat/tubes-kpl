@@ -8,7 +8,7 @@ import { AuroraText } from '../../../components/magicui/aurora-text'
 function HeroSection() {
   return (
     <section className="overflow-hidden">
-      <div className="relative mt-17 py-16 border-b z-10 bg-slate-50">
+      <div className="relative mt-17 py-8 md:py-16 border-b z-10 bg-linear-to-tr from-slate-200 to-white">
         <InteractiveGridPattern
           width={100}
           height={140}

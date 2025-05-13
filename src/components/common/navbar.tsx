@@ -40,7 +40,7 @@ function Navbar() {
                 <li key={index}>
                   <Link
                     to={item.href}
-                    className="text-foreground hover:text-primary block hover:underline duration-150"
+                    className="text-foreground hover:text-primary block hover:underline font-mono tracking-tight duration-150"
                   >
                     <span>{item.name}</span>
                   </Link>
@@ -67,7 +67,7 @@ function Navbar() {
 
             <hr className='h-1' />
 
-            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit font-sans">
+            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit font-mono tracking-tight">
               <Button asChild variant="outline" size="default">
                 <Link to="#">
                   <span>Sign in</span>

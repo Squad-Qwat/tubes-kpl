@@ -6,7 +6,7 @@ function MainLayout() {
   return (
     <>    
       <Navbar />
-      <main className='overflow-hidden text-foreground text-base font-sans'>
+      <main className='overflow-hidden text-foreground text-base font-mono tracking-tight'>
         <Outlet />
       </main>
       <Footer />
