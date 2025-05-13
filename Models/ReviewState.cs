@@ -34,9 +34,8 @@ namespace PaperNest_API.Models
         public string Name => "Under Review";
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {
-            // Using the correct constructor from Review model
-            request.AddReview(new Review(request.Id, "Reviewer", result, reviewerComment));
+        {   
+            request.AddReview(new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
             {
@@ -57,7 +56,16 @@ namespace PaperNest_API.Models
         public string Name => "Approved";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            Console.WriteLine("Research request is already approved.");
+            Console.WriteLine("Permintaan peninjauan telah disetujui.");
+        }
+    }
+
+    public class RejectedState : ReviewState
+    {
+        public string Name => "Rejected";
+        public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
+        {
+            Console.WriteLine("Permintaan peninjauan telah ditolak.");
         }
     }
 
@@ -65,11 +73,11 @@ namespace PaperNest_API.Models
     {
         public string Name => "Needs Revision";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {
+        {   
             if (result == ReviewResult.Approved)
             {
                 request.ChangeState(new ApprovedState());
-            }
+            } 
             else
             {
                 Console.WriteLine($"Research request is still under revision or received another review result: {result}");

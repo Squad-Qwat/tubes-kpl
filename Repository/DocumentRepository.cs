@@ -4,6 +4,6 @@ namespace PaperNest_API.Repository
 {
     public class DocumentRepository
     {
-        public static List<Document> documentList = new List<Document>();
+        public static List<Document> documents = new List<Document>();
     }
 }

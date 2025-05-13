@@ -2,7 +2,6 @@ using PaperNest_API.Controllers;
 using PaperNest_API.Models;
 using PaperNest_API.Utils;
 using PaperNest_API.Services;
-using PaperNest_API.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PaperNest_API.View
@@ -16,7 +15,6 @@ namespace PaperNest_API.View
         private readonly AuthStateMachine _authState;
         private User? _currentUser;
         private Workspace? _currentWorkspace;
-        private readonly CitationView _citationView; // Add this line
 
         public CLIView()
         {
@@ -27,7 +25,6 @@ namespace PaperNest_API.View
             _authState = new AuthStateMachine();
             _currentUser = null;
             _currentWorkspace = null;
-            _citationView = new CitationView(); // Initialize CitationView
         }
 
         public void Start()
@@ -94,7 +91,6 @@ namespace PaperNest_API.View
                 Console.WriteLine("1. Lihat Workspace");
                 Console.WriteLine("2. Lihat Permintaan Review");
                 Console.WriteLine("3. Kelola Review");
-                Console.WriteLine("4. Bergabung dengan Workspace");
             }else{
                 Console.WriteLine("Role tidak dikenali. Silakan coba lagi.");
             }
@@ -143,16 +139,6 @@ namespace PaperNest_API.View
                     else if (_currentUser?.Role == "Dosen")
                     {
                         ManageReviews();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Menu tidak valid untuk role Anda.");
-                    }
-                    break;
-                case "4":
-                    if (_currentUser?.Role == "Dosen")
-                    {
-                        JoinWorkspace();
                     }
                     else
                     {
@@ -331,18 +317,7 @@ namespace PaperNest_API.View
             
             Console.WriteLine("\n=== Daftar Workspace ===");
             
-            IActionResult result;
-            
-            if (_currentUser.Role == "Dosen")
-            {
-                // Untuk dosen, tampilkan workspace yang diikuti
-                result = _workspaceController.GetJoinedWorkspaces(_currentUser.Id);
-            }
-            else
-            {
-                // Untuk mahasiswa, tampilkan workspace yang dimiliki
-                result = _workspaceController.GetWorkspacesByUserId(_currentUser.Id);
-            }
+            var result = _workspaceController.GetWorkspacesByUserId(_currentUser.Id);
             
             if (result is OkObjectResult okResult)
             {
@@ -351,15 +326,7 @@ namespace PaperNest_API.View
                 
                 if (workspaces == null || !workspaces.Any())
                 {
-                    if (_currentUser.Role == "Dosen")
-                    {
-                        Console.WriteLine("Anda belum bergabung dengan workspace manapun.");
-                        Console.WriteLine("Gunakan menu 'Bergabung dengan Workspace' untuk bergabung.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Belum ada workspace.");
-                    }
+                    Console.WriteLine("Belum ada workspace.");
                     return;
                 }
                 
@@ -369,7 +336,7 @@ namespace PaperNest_API.View
                     string description = workspace.Description ?? "Tidak ada deskripsi";
                     string createdAt = workspace.Created_at.ToString("dd/MM/yyyy HH:mm:ss");
                     
-                    Console.WriteLine($"{index}. {workspace.Name} [ID: {workspace.Id}]");
+                    Console.WriteLine($"{index}. {workspace.Name}");
                     Console.WriteLine($"   Deskripsi: {description}");
                     Console.WriteLine($"   Dibuat pada: {createdAt}");
                     Console.WriteLine();
@@ -415,73 +382,39 @@ namespace PaperNest_API.View
             while (!backToMainMenu)
             {
                 Console.WriteLine($"\n=== Workspace: {_currentWorkspace.Name} ===");
-                
-                // Tampilkan menu yang berbeda berdasarkan role
-                if (_currentUser?.Role == "Dosen")
-                {
-                    // Menu terbatas untuk dosen - hanya lihat dokumen
-                    Console.WriteLine("1. Lihat Dokumen");
-                    Console.WriteLine("0. Kembali ke Menu Utama");
-                }
-                else
-                {
-                    // Menu lengkap untuk mahasiswa
-                    Console.WriteLine("1. Lihat Dokumen");
-                    Console.WriteLine("2. Buat Dokumen Baru");
-                    Console.WriteLine("3. Edit Info Workspace");
-                    Console.WriteLine("4. Hapus Workspace");
-                    Console.WriteLine("0. Kembali ke Menu Utama");
-                }
-                
+                Console.WriteLine("1. Lihat Dokumen");
+                Console.WriteLine("2. Buat Dokumen Baru");
+                Console.WriteLine("3. Edit Info Workspace");
+                Console.WriteLine("4. Hapus Workspace");
+                Console.WriteLine("0. Kembali ke Menu Utama");
                 Console.Write("Pilih menu: ");
                 
                 string? choice = Console.ReadLine();
                 
-                if (_currentUser?.Role == "Dosen")
+                switch (choice)
                 {
-                    // Pilihan terbatas untuk dosen
-                    switch (choice)
-                    {
-                        case "1":
-                            ViewDocuments();
-                            break;
-                        case "0":
+                    case "1":
+                        ViewDocuments();
+                        break;
+                    case "2":
+                        CreateNewDocument();
+                        break;
+                    case "3":
+                        EditWorkspace();
+                        break;
+                    case "4":
+                        if (DeleteWorkspace())
+                        {
                             backToMainMenu = true;
-                            _currentWorkspace = null;
-                            break;
-                        default:
-                            Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
-                            break;
-                    }
-                }
-                else
-                {
-                    // Pilihan lengkap untuk mahasiswa
-                    switch (choice)
-                    {
-                        case "1":
-                            ViewDocuments();
-                            break;
-                        case "2":
-                            CreateNewDocument();
-                            break;
-                        case "3":
-                            EditWorkspace();
-                            break;
-                        case "4":
-                            if (DeleteWorkspace())
-                            {
-                                backToMainMenu = true;
-                            }
-                            break;
-                        case "0":
-                            backToMainMenu = true;
-                            _currentWorkspace = null;
-                            break;
-                        default:
-                            Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
-                            break;
-                    }
+                        }
+                        break;
+                    case "0":
+                        backToMainMenu = true;
+                        _currentWorkspace = null;
+                        break;
+                    default:
+                        Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
+                        break;
                 }
                 
                 if (!backToMainMenu)
@@ -509,14 +442,14 @@ namespace PaperNest_API.View
             if (result is OkObjectResult okResult)
             {
                 dynamic? resultData = okResult.Value;
-                // Sebelum perubahan: IEnumerable<Document>? documents = resultData?.data as IEnumerable<Document>;
-
-                if (resultData?.data is not IEnumerable<Document> documents || !documents.Any()) // Sebelum perubahan: 'documents == null || !documents.Any()'
+                var documents = resultData?.data as IEnumerable<Document>;
+                
+                if (documents == null || !documents.Any())
                 {
                     Console.WriteLine("Belum ada dokumen di workspace ini.");
                     return;
                 }
-
+                
                 int index = 1;
                 foreach (var document in documents)
                 {
@@ -597,25 +530,24 @@ namespace PaperNest_API.View
                 Console.WriteLine("Gagal membuat dokumen.");
             }
         }
-
+        
         // Menu untuk dokumen yang dipilih
-        private void DocumentMenu(Document? document)
+        private void DocumentMenu(Document document)
         {
             if (document == null)
             {
                 Console.WriteLine("Tidak ada dokumen yang dipilih.");
                 return;
             }
-
+            
             bool backToWorkspaceMenu = false;
-
+            
             while (!backToWorkspaceMenu)
             {
                 // Tampilkan informasi tentang draft jika ada
                 string draftInfo = "";
-
-                // Kode ini kena peringatan karena ada potensi nilai null, jadi gw kasih null checking biar dia nggak null
-                if (document != null && document.HasDraft == true && document.LastEditedByUserId.HasValue)
+                
+                if (document.HasDraft && document.LastEditedByUserId.HasValue)
                 {
                     var lastEditor = Repository.UserRepository.userRepository.FirstOrDefault(u => u.Id == document.LastEditedByUserId.Value);
                     string lastEditorName = lastEditor?.Name ?? "Pengguna lain";
@@ -626,43 +558,20 @@ namespace PaperNest_API.View
                 Console.WriteLine($"Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
                 Console.WriteLine($"Konten: {document.Content ?? "Tidak ada konten"}");
                 Console.WriteLine($"Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine(draftInfo);
                 
-                if (_currentUser?.Role != "Dosen")
-                {
-                    Console.WriteLine(draftInfo);
-                }
-                
-                // Tampilkan menu yang berbeda berdasarkan role
-                if (_currentUser?.Role == "Dosen")
-                {
-                    // Menu terbatas untuk dosen
-                    Console.WriteLine("\n1. Lihat Versi Dokumen");
-                    Console.WriteLine("2. Review Dokumen");
-                    Console.WriteLine("0. Kembali ke Menu Workspace");
-                }
-                else
-                {
-                    // Menu lengkap untuk mahasiswa
-                    Console.WriteLine("\n1. Edit Dokumen (Judul, Deskripsi)");
-                    Console.WriteLine("2. Edit Konten Dokumen");
-                    Console.WriteLine("3. Hapus Dokumen");
-                    Console.WriteLine("4. Manajemen Versi Dokumen");
-                    Console.WriteLine("0. Kembali ke Menu Workspace");
-                }
-                
+                Console.WriteLine("\n1. Edit Dokumen (Judul, Deskripsi)");
+                Console.WriteLine("2. Edit Konten Dokumen");
+                Console.WriteLine("3. Hapus Dokumen");
+                Console.WriteLine("4. Manajemen Versi Dokumen");
+                Console.WriteLine("0. Kembali ke Menu Workspace");
                 Console.Write("Pilih menu: ");
-
+                
                 string? choice = Console.ReadLine();
-
+                
                 switch (choice)
                 {
                     case "1":
-                        if (document == null)
-                        {
-                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                            break;
-                        }
-
                         EditDocumentMetadata(document);
                         // Refresh document data
                         var refreshResult = _documentController.GetDocumentById(document.Id);
@@ -673,12 +582,6 @@ namespace PaperNest_API.View
                         }
                         break;
                     case "2":
-                        if(document == null)
-                        {
-                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                            break;
-                        }
-
                         EditDocumentContent(document);
                         // Refresh document data
                         var refreshContentResult = _documentController.GetDocumentById(document.Id);
@@ -689,12 +592,6 @@ namespace PaperNest_API.View
                         }
                         break;
                     case "3":
-                        if(document == null)
-                        {
-                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                            break;
-                        }
-
                         if (DeleteDocument(document.Id))
                         {
                             backToWorkspaceMenu = true;
@@ -703,15 +600,6 @@ namespace PaperNest_API.View
                     case "4":
                         ManageDocumentVersions(document);
                         break;
-                    case "5": // Added
-                        if (document == null)
-                        {
-                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                            break;
-                        }
-
-                        GenerateCitation(document);
-                        break;
                     case "0":
                         backToWorkspaceMenu = true;
                         break;
@@ -719,7 +607,7 @@ namespace PaperNest_API.View
                         Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
                         break;
                 }
-
+                
                 if (!backToWorkspaceMenu)
                 {
                     Console.WriteLine("\nTekan tombol apa saja untuk melanjutkan...");
@@ -728,10 +616,9 @@ namespace PaperNest_API.View
                 }
             }
         }
-
-        // Dikasih null checking (?) karena area input (pemanggilan kode di atas) berpotensi nilai null.
+        
         // Method untuk mengedit metadata dokumen (judul, deskripsi, status)
-        private void EditDocumentMetadata(Document? document)
+        private void EditDocumentMetadata(Document document)
         {
             if (document == null)
             {
@@ -774,7 +661,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk mengedit konten dokumen
-        private void EditDocumentContent(Document? document)
+        private void EditDocumentContent(Document document)
         {
             if (document == null)
             {
@@ -843,7 +730,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk manajemen versi dokumen
-        private void ManageDocumentVersions(Document? document)
+        private void ManageDocumentVersions(Document document)
         {
             if (document == null)
             {
@@ -903,14 +790,6 @@ namespace PaperNest_API.View
             
             Console.WriteLine($"\n=== Kirim Versi Baru Dokumen: {document.Title} ===");
             
-            // Periksa apakah versi sebelumnya sudah direview
-            if (!DocumentBodyService.CanCreateNewVersion(document.Id))
-            {
-                Console.WriteLine("Tidak dapat membuat versi baru karena masih ada versi yang belum direview oleh dosen.");
-                Console.WriteLine("Harap tunggu hingga versi sebelumnya direview sebelum membuat versi baru.");
-                return;
-            }
-            
             // Gunakan konten dari dokumen saat ini (yang mungkin berisi draft)
             string currentContent = document.Content ?? string.Empty;
             bool hasDraft = document.HasDraft;
@@ -965,7 +844,6 @@ namespace PaperNest_API.View
             if (result is OkObjectResult)
             {
                 Console.WriteLine("Versi baru dokumen berhasil dikirim!");
-                Console.WriteLine("Versi ini perlu direview oleh dosen sebelum Anda dapat membuat versi baru lagi.");
                 
                 // Informasikan bahwa draft telah menjadi versi baru
                 if (hasDraft)
@@ -1178,66 +1056,7 @@ namespace PaperNest_API.View
                 return false;
             }
         }
-
-        private void GenerateCitation(Document document)
-        {
-            if (document == null)
-            {
-                Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                return;
-            }
-
-            Console.WriteLine("\n=== Generate Citation ===");
-            Console.WriteLine("1. Tampilkan Sitasi");
-            Console.WriteLine("2. Tampilkan Bibliografi");
-            Console.WriteLine("3. Tampilkan Sitasi Text");
-            Console.Write("Pilih jenis format sitasi: ");
-
-            string? choice = Console.ReadLine();
-
-            if(_currentUser == null)
-            {
-                Console.WriteLine("Anda harus login terlebih dahulu.");
-                return;
-            }
-
-            var citation = new Citation(123, CitationType.JournalArticle, document.Title, author: _currentUser.Name, publicationInfo: ""); // Replace with actual publication info
-            /*
-             {
-                Id = 123,
-                Type = CitationType.JournalArticle,
-                Title = document.Title,
-                Author = _currentUser.Name,  // Replace with actual author logic
-                PublicationInfo = "Jurnal Ilmiah XYZ, Vol. 10, No. 1, pp. 45-60, 2023", // Make dynamic
-                PublicationDate = DateTime.Now, // Make dynamic
-                AccessDate = "2024-07-24", // Make dynamic
-                DOI = "10.1234/xyz.12345" // Make dynamic
-            };
-            */
-            var bibliography = new List<string>
-            {
-                $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.",
-                 // Add more bibliography entries as needed.
-            };
-            string citationText = $"{citation.Author} ({citation.PublicationDate?.Year}). {citation.Title}."; // Example, remove page section because it's non-existent
-
-            switch (choice)
-            {
-                case "1":
-                    _citationView.DisplayCitation(citation);
-                    break;
-                case "2":
-                    _citationView.DisplayBibliography(bibliography);
-                    break;
-                case "3":
-                    _citationView.DisplayCitationText(citationText);
-                    break;
-                default:
-                    Console.WriteLine("Pilihan tidak valid.");
-                    break;
-            }
-        }
-
+        
         // Method untuk menghapus dokumen
         private bool DeleteDocument(Guid documentId)
         {
@@ -1613,275 +1432,5 @@ namespace PaperNest_API.View
             Console.WriteLine("\nTekan tombol apa saja untuk kembali...");
             Console.ReadKey();
         }
-
-        // Method untuk dosen bergabung dengan workspace
-        private void JoinWorkspace()
-        {
-            if (_currentUser == null)
-            {
-                Console.WriteLine("Anda harus login terlebih dahulu.");
-                return;
-            }
-            
-            if (_currentUser.Role != "Dosen")
-            {
-                Console.WriteLine("Fitur ini hanya tersedia untuk dosen.");
-                return;
-            }
-            
-            Console.WriteLine("\n=== Bergabung dengan Workspace ===");
-            Console.WriteLine("Masukkan ID Workspace untuk bergabung.");
-            Console.WriteLine("Anda dapat meminta ID Workspace dari mahasiswa pengelola workspace.");
-            
-            Console.Write("\nID Workspace: ");
-            string? workspaceIdStr = Console.ReadLine();
-            
-            if (string.IsNullOrEmpty(workspaceIdStr))
-            {
-                Console.WriteLine("ID Workspace tidak boleh kosong!");
-                return;
-            }
-            
-            // Coba parse ID workspace
-            if (!Guid.TryParse(workspaceIdStr, out Guid workspaceId))
-            {
-                Console.WriteLine("ID Workspace tidak valid. Pastikan format ID benar.");
-                return;
-            }
-            
-            // Cek apakah workspace ada
-            var result = _workspaceController.GetWorkspaceById(workspaceId);
-            
-            if (result is OkObjectResult okResult)
-            {
-                dynamic? resultData = okResult.Value;
-                var workspace = resultData?.data as Workspace;
-                
-                if (workspace != null)
-                {
-                    Console.WriteLine($"Workspace ditemukan: {workspace.Name}");
-                    Console.WriteLine($"Deskripsi: {workspace.Description ?? "Tidak ada deskripsi"}");
-                    Console.WriteLine($"Pemilik: {workspace.User?.Name ?? "Unknown"}");
-                    
-                    Console.Write("\nApakah Anda yakin ingin bergabung dengan workspace ini? (y/n): ");
-                    string? confirmation = Console.ReadLine()?.ToLower();
-                    
-                    if (confirmation == "y")
-                    {
-                        // Bergabung dengan workspace
-                        var joinResult = _workspaceController.JoinWorkspace(workspaceId, _currentUser.Id);
-                        
-                        if (joinResult is OkObjectResult joinOkResult)
-                        {
-                            Console.WriteLine("\nBerhasil bergabung dengan workspace!");
-                            Console.WriteLine("Anda sekarang dapat melihat dokumen dan memberikan review pada workspace ini.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("\nGagal bergabung dengan workspace. Silakan coba lagi nanti.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nBergabung dengan workspace dibatalkan.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Workspace tidak ditemukan. Silakan periksa ID workspace.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Workspace tidak ditemukan. Silakan periksa ID workspace.");
-            }
-        }
-
-        // Method baru untuk dosen mereview versi dokumen
-        private void ReviewDocumentVersions(Guid documentId)
-        {
-            Console.WriteLine("\n=== Review Versi Dokumen ===");
-            
-            // Dapatkan versi dokumen yang sudah di-commit (bukan draft)
-            var versions = DocumentBodyService.GetVersions(documentId)
-                   .Where(v => v.IsCurrentVersion || (!v.IsCurrentVersion && v.ReviewId == Guid.Empty))
-                   .ToList();
-            
-            if (versions == null || !versions.Any())
-            {
-                Console.WriteLine("Belum ada versi dokumen yang perlu di-review.");
-                return;
-            }
-            
-            int index = 1;
-            foreach (var version in versions)
-            {
-                string reviewStatus = "";
-                // Jika reviewId adalah empty, berarti belum direview
-                if (version.ReviewId == Guid.Empty)
-                {
-                    reviewStatus = "[PERLU REVIEW]";
-                }
-                
-                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")} {reviewStatus}");
-                Console.WriteLine($"   {(version.IsCurrentVersion ? "[AKTIF]" : "")}");
-                Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
-                // Tampilkan preview konten (maksimal 50 karakter)
-                string contentPreview = version.Content.Length > 50 
-                    ? version.Content.Substring(0, 50) + "..." 
-                    : version.Content;
-                Console.WriteLine($"   Preview: {contentPreview}");
-                Console.WriteLine();
-                index++;
-            }
-            
-            Console.Write("Pilih versi untuk review (nomor) atau 0 untuk kembali: ");
-            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= versions.Count())
-            {
-                var selectedVersion = versions.ElementAt(choice - 1);
-                ReviewVersion(selectedVersion);
-            }
-        }
-
-        // Method untuk mereview satu versi dokumen
-        private void ReviewVersion(DocumentBody version)
-        {
-            if (version == null)
-            {
-                Console.WriteLine("Versi tidak ditemukan.");
-                return;
-            }
-            
-            Console.WriteLine($"\n=== Review Versi {version.Id} ===");
-            Console.WriteLine($"Dibuat pada: {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
-            Console.WriteLine($"Status: {(version.IsCurrentVersion ? "Aktif" : "Tidak Aktif")}");
-            Console.WriteLine($"Deskripsi: {version.VersionDescription}");
-            Console.WriteLine("\nKonten:");
-            Console.WriteLine(version.Content);
-            
-            // Jika sudah direview sebelumnya, tampilkan informasi review
-            if (version.IsReviewed && version.ReviewId != Guid.Empty)
-            {
-                Console.WriteLine("\nDokumen ini sudah direview sebelumnya.");
-                Console.WriteLine($"Hasil review: {version.ReviewResult}");
-                // TO DO: Tambahkan kode untuk menampilkan detail review jika diperlukan
-                
-                Console.WriteLine("\nApakah Anda ingin membuat review baru? (y/n): ");
-                string? choice = Console.ReadLine()?.ToLower();
-                if (choice != "y")
-                {
-                    return;
-                }
-            }
-            
-            Console.WriteLine("\n=== Buat Review ===");
-            Console.WriteLine("1. Setujui (Approve)");
-            Console.WriteLine("2. Perlu Revisi (Needs Revision)");
-            Console.WriteLine("3. Tolak (Reject)");
-            Console.WriteLine("0. Kembali tanpa Review");
-            
-            Console.Write("Pilihan: ");
-            string? reviewChoice = Console.ReadLine();
-            
-            if (reviewChoice == "0")
-            {
-                return;
-            }
-            
-            // Tentukan result berdasarkan pilihan
-            ReviewResult result;
-            switch (reviewChoice)
-            {
-                case "1":
-                    result = ReviewResult.Approved;
-                    break;
-                case "2":
-                    result = ReviewResult.NeedsRevision;
-                    break;
-                case "3":
-                    result = ReviewResult.Rejected;
-                    break;
-                default:
-                    Console.WriteLine("Pilihan tidak valid.");
-                    return;
-            }
-            
-            Console.Write("Masukkan komentar untuk review: ");
-            string comment = Console.ReadLine() ?? "";
-            
-            // Buat objek ResearchRequest jika belum ada
-            // Kita perlu membuat permintaan penelitian untuk versi ini
-            var document = DocumentBodyService.GetDocumentById(version.DocumentId);
-            if (document == null)
-            {
-                Console.WriteLine("Dokumen tidak ditemukan.");
-                return;
-            }
-            
-            // Cek apakah sudah ada research request untuk dokumen ini
-            var researchRequestController = new ResearchRequestController();
-            var allRequests = researchRequestController.GetAllRequests();
-            var existingRequest = allRequests.FirstOrDefault(r => r.DocumentBodyId == version.Id);
-            
-            Guid requestId;
-            
-            if (existingRequest == null)
-            {
-                // Buat research request baru
-                string title = $"Review untuk {document.Title} - {version.VersionDescription}";
-                string abstractText = $"Review dokumen versi dari {version.Created_at}";
-                string researcherName = document.User?.Name ?? "Unknown";
-                
-                // Tambahkan request
-                researchRequestController.AddRequest(title, abstractText, researcherName, document.User_id, version.Id);
-                
-                // Dapatkan ID request yang baru dibuat
-                var newRequests = researchRequestController.GetAllRequests();
-                var newRequest = newRequests.LastOrDefault();
-                if (newRequest == null)
-                {
-                    Console.WriteLine("Gagal membuat permintaan review.");
-                    return;
-                }
-                
-                requestId = newRequest.Id;
-            }
-            else
-            {
-                requestId = existingRequest.Id;
-            }
-            
-            // Mulai review
-            researchRequestController.StartReview(requestId);
-            
-            // Proses review
-            researchRequestController.ProcessReview(requestId, result, _currentUser.Id, comment);
-            
-            // Update ReviewId di DocumentBody
-            var success = DocumentBodyService.MarkVersionAsReviewed(version.Id, requestId, result);
-            
-            if (success)
-            {
-                Console.WriteLine("\nReview berhasil disimpan!");
-                Console.WriteLine($"Status review: {result}");
-                if (result == ReviewResult.Approved)
-                {
-                    Console.WriteLine("Dokumen telah disetujui. Mahasiswa dapat melanjutkan versi berikutnya.");
-                }
-                else if (result == ReviewResult.NeedsRevision)
-                {
-                    Console.WriteLine("Dokumen perlu revisi. Mahasiswa akan diminta untuk membuat perubahan.");
-                }
-                else
-                {
-                    Console.WriteLine("Dokumen ditolak. Mahasiswa perlu membuat perubahan besar sebelum mengajukan ulang.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("\nGagal memperbarui status review pada dokumen.");
-            }
-        }
     }
 }
-

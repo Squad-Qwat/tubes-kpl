@@ -51,6 +51,18 @@ namespace PaperNest_API.Controllers
             });
         }
 
+        [HttpGet("joined/{userId}")]
+        public IActionResult GetJoinedWorkspaces(Guid userId)
+        {
+            var workspaces = WorkspaceService.GetJoinedWorkspaces(userId);
+
+            return Ok(new
+            {
+                message = "Berhasil mendapatkan workspace yang diikuti",
+                data = workspaces
+            });
+        }
+
         [HttpPost]
         public IActionResult CreateWorkspace([FromBody] Workspace workspace)
         {
@@ -61,6 +73,32 @@ namespace PaperNest_API.Controllers
             {
                 message = "Berhasil membuat workspace baru",
                 data = workspace
+            });
+        }
+
+        [HttpPost("join")]
+        public IActionResult JoinWorkspace(Guid workspaceId, Guid userId, RoleType role = RoleType.Lecturer)
+        {
+            var userWorkspace = WorkspaceService.JoinWorkspace(workspaceId, userId, role);
+            
+            if (userWorkspace == null)
+            {
+                return NotFound(new
+                {
+                    message = "Workspace tidak ditemukan"
+                });
+            }
+            
+            var workspace = WorkspaceService.GetById(workspaceId);
+            
+            return Ok(new
+            {
+                message = "Berhasil bergabung dengan workspace",
+                data = new
+                {
+                    workspace = workspace,
+                    userWorkspace = userWorkspace
+                }
             });
         }
 

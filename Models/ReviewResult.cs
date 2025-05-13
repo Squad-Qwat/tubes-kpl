@@ -5,7 +5,7 @@
         Unsubmited,
         Pending,
         Approved,
+        NeedsRevision,
         Rejected,
-        NeedsRevision
     }
 }
