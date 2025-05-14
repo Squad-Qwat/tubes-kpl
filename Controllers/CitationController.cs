@@ -1,6 +1,7 @@
 ﻿using System;
 using PaperNest_API.Models;
 using PaperNest_API.Views;
+using PaperNest_API.Utils;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -143,58 +144,53 @@ namespace PaperNest_API.Controllers
     [Route("api/citations")]
     public class CitationController : ControllerBase
     {
-        private readonly Dictionary<int, Citation> _citations = new Dictionary<int, Citation>();
+        private readonly Dictionary<int, Citation> _citations = []; // Setara dengan 'new Dictionary<int, Citation>()';
         private int _nextId = 1;
 
-        private readonly Dictionary<CitationType, Action<Citation, List<string>>> _bibliographyFormatters =
-            new Dictionary<CitationType, Action<Citation, List<string>>>
+        // Constructor to initialize with some dummy data if needed
+        public CitationController()
+        {
+            // Example initial data
+            _citations.Add(_nextId++, new Citation(1, CitationType.Book, "Contoh Judul Buku", "Pengarang Buku", "Penerbit Contoh")
             {
-            { CitationType.Book, (citation, bibliography) =>
-                {
-                    string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.";
-                    bibliography.Add(entry);
-                }
-            },
-            { CitationType.JournalArticle, (citation, bibliography) =>
-                {
-                    string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.";
-                    bibliography.Add(entry);
-                }
-            },
-            { CitationType.Website, (citation, bibliography) =>
-                {
-                    string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}. Retrieved from {citation.AccessDate}";
-                    bibliography.Add(entry);
-                }
-            },
-            { CitationType.ConferencePaper, (citation, bibliography) =>
-                {
-                    string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. In {citation.PublicationInfo}.";
-                    bibliography.Add(entry);
-                }
-            },
-            { CitationType.Thesis, (citation, bibliography) =>
-                {
-                    string entry = $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.";
-                    bibliography.Add(entry);
-                }
-            },
-                // Add other citation types as needed
+                PublicationDate = new DateTime(2020, 1, 15)
+            });
+            _citations.Add(_nextId++, new Citation(2, CitationType.JournalArticle, "Artikel Jurnal Bagus", "Penulis Artikel", "Jurnal Sains, Vol. 10, No. 2, pp. 123-145")
+            {
+                PublicationDate = new DateTime(2022, 5, 10),
+                DOI = "10.1234/journal.article.123"
+            });
+            _citations.Add(_nextId++, new Citation(3, CitationType.Website, "Panduan Online", "Webmaster", "https://example.com/panduan")
+            {
+                PublicationDate = new DateTime(2023, 3, 20),
+                AccessDate = "2024-05-15"
+            });
+        }
+
+
+        // The bibliography formatters dictionary should use CitationFormatter
+        private readonly Dictionary<CitationType, Func<Citation, string>> _bibliographyFormatters =
+            new Dictionary<CitationType, Func<Citation, string>>
+            {
+                { CitationType.Book, citation => CitationFormatter.GenerateAPAStyle(citation) },
+                { CitationType.JournalArticle, citation => CitationFormatter.GenerateAPAStyle(citation) },
+                { CitationType.Website, citation => CitationFormatter.GenerateAPAStyle(citation) },
+                { CitationType.ConferencePaper, citation => CitationFormatter.GenerateAPAStyle(citation) },
+                { CitationType.Thesis, citation => CitationFormatter.GenerateAPAStyle(citation) }
             };
+
 
         [HttpPost]
         public IActionResult CreateCitation([FromBody] CitationRequestModel model)
         {
-            var newCitation = new Citation(
-                _nextId++,
-                model.Type,
-                model.Title,
-                model.Author,
-                model.PublicationInfo
-            )
+            if (model == null)
+            {
+                return BadRequest(new { message = "Permintaan tidak valid." });
+            }
+
+            var newCitation = new Citation(_nextId++, model.Type, model.Title, model.Author, model.PublicationInfo)
             {
                 PublicationDate = model.PublicationDate,
-                // Kalau null, maka variable nilai kiri bakal null. Nggak bakal bikin null error
                 AccessDate = model.AccessDate,
                 DOI = model.DOI
             };
@@ -207,6 +203,21 @@ namespace PaperNest_API.Controllers
                 data = newCitation
             });
         }
+
+        // Helper method for the console app to add citations (not a direct API endpoint)
+        public Citation? AddCitation(CitationType type, string title, string author, string publicationInfo, DateTime? publicationDate = null, string? accessDate = null, string? doi = null)
+        {
+            var newCitation = new Citation(_nextId++, type, title, author, publicationInfo)
+            {
+                PublicationDate = publicationDate,
+                AccessDate = accessDate,
+                DOI = doi
+            };
+
+            _citations.Add(newCitation.Id, newCitation);
+            return newCitation; // Return the added citation for direct use in console
+        }
+
 
         [HttpGet("{id}")]
         public IActionResult GetCitationById(int id)
@@ -241,6 +252,7 @@ namespace PaperNest_API.Controllers
                 });
             }
 
+            // Apply updates only if the new value is provided
             if (model.Type.HasValue) existingCitation.Type = model.Type.Value;
             if (model.Title != null) existingCitation.Title = model.Title;
             if (model.Author != null) existingCitation.Author = model.Author;
@@ -255,6 +267,27 @@ namespace PaperNest_API.Controllers
                 data = existingCitation
             });
         }
+
+        // Helper method for the console app to update citations (not a direct API endpoint)
+        public Citation? UpdateCitation(int id, CitationType? type, string? title, string? author, string? publicationInfo, DateTime? publicationDate, string? accessDate, string? doi)
+        {
+            var existingCitation = GetCitation(id);
+            if (existingCitation == null)
+            {
+                return null;
+            }
+
+            if (type.HasValue) existingCitation.Type = type.Value;
+            if (title != null) existingCitation.Title = title;
+            if (author != null) existingCitation.Author = author;
+            if (publicationInfo != null) existingCitation.PublicationInfo = publicationInfo;
+            if (publicationDate.HasValue) existingCitation.PublicationDate = publicationDate.Value;
+            if (accessDate != null) existingCitation.AccessDate = accessDate;
+            if (doi != null) existingCitation.DOI = doi;
+
+            return existingCitation;
+        }
+
 
         [HttpDelete("{id}")]
         public IActionResult DeleteCitation(int id)
@@ -275,6 +308,12 @@ namespace PaperNest_API.Controllers
             });
         }
 
+        // Helper method for the console app to delete citations (not a direct API endpoint)
+        public bool EraseCitation(int id)
+        {
+            return _citations.Remove(id);
+        }
+
         [HttpGet("bibliography")]
         public IActionResult GenerateBibliography()
         {
@@ -283,7 +322,7 @@ namespace PaperNest_API.Controllers
             {
                 if (_bibliographyFormatters.TryGetValue(citation.Type, out var formatter))
                 {
-                    formatter(citation, bibliography);
+                    bibliography.Add(formatter(citation));
                 }
                 else
                 {
@@ -297,6 +336,25 @@ namespace PaperNest_API.Controllers
                 data = bibliography
             });
         }
+
+        // Helper method to get all citations for the console app
+        public List<string> GetAllBibliographyItems()
+        {
+            var bibliography = new List<string>();
+            foreach (var citation in _citations.Values.OrderBy(c => c.Author))
+            {
+                if (_bibliographyFormatters.TryGetValue(citation.Type, out var formatter))
+                {
+                    bibliography.Add(formatter(citation));
+                }
+                else
+                {
+                    bibliography.Add($"Format sitasi tidak didukung untuk tipe: {citation.Type}");
+                }
+            }
+            return bibliography;
+        }
+
 
         [HttpGet("{id}/citation-text")]
         public IActionResult GenerateCitationText(int id)
@@ -314,11 +372,24 @@ namespace PaperNest_API.Controllers
             return Ok(new
             {
                 message = "Berhasil menghasilkan teks sitasi",
-                data = citation.GenerateAPAStyle()
+                data = CitationFormatter.GenerateAPAStyle(citation)
             });
         }
 
-        private Citation? GetCitation(int id)
+        // Helper method for the console app to get a single citation text
+        public string GetCitationText(int id)
+        {
+            var citation = GetCitation(id);
+            if (citation == null)
+            {
+                return "Sitasi tidak ditemukan.";
+            }
+            return CitationFormatter.GenerateAPAStyle(citation);
+        }
+
+
+        // Make this method public so the console app can access it
+        public Citation? GetCitation(int id)
         {
             return _citations.TryGetValue(id, out var citation) ? citation : null;
         }

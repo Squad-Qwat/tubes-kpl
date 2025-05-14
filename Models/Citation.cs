@@ -1,17 +1,33 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace PaperNest_API.Models
 {
     public class Citation
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
+
+        [Required]
         public CitationType Type { get; set; }
+
+        [Required]
         public string Title { get; set; }
+
+        [Required]
         public string Author { get; set; }
+
+        [Required]
         public string PublicationInfo { get; set; } //  Details vary by type (e.g., ISBN, Journal Name, URL)
+
         public DateTime? PublicationDate { get; set; } // Use nullable DateTime
-        public string AccessDate { set; get; }
-        public string DOI { get; set; }
+
+        public string? AccessDate { get; set; }
+
+        public string? DOI { get; set; }
+
         // Add more properties as needed (e.g., editor, publisher, volume, issue, pages)
 
         public Citation(int id, CitationType type, string title, string author, string publicationInfo)
@@ -22,42 +38,15 @@ namespace PaperNest_API.Models
             Author = author;
             PublicationInfo = publicationInfo;
         }
-
-        public string GenerateAPAStyle()
-        {
-            string apaString = "";
-            switch (Type)
-            {
-                case CitationType.Book:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}.";
-                    break;
-                case CitationType.JournalArticle:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. *{PublicationInfo}*.";
-                    break;
-                case CitationType.Website:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}. Diakses dari {AccessDate}";
-                    break;
-                case CitationType.ConferencePaper:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. In *{PublicationInfo}*.";
-                    break;
-                case CitationType.Thesis:
-                    apaString = $"{Author}. ({PublicationDate?.Year}). *{Title}*. {PublicationInfo}.";
-                    break;
-                default:
-                    apaString = "Format sitasi tidak didukung.";
-                    break;
-            }
-            return apaString;
-        }
     }
 
     // Model class required for controller class (move here so the controller class doesn't have to deal with the model directly)
     public class CitationRequestModel
     {
         public CitationType Type { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public string PublicationInfo { get; set; }
+        public string? Title { get; set; }
+        public string? Author { get; set; }
+        public string? PublicationInfo { get; set; }
         public DateTime? PublicationDate { get; set; }
         public string? AccessDate { get; set; }
         public string? DOI { get; set; }

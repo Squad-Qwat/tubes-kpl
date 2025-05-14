@@ -2,6 +2,7 @@ using PaperNest_API.Controllers;
 using PaperNest_API.Models;
 using PaperNest_API.Utils;
 using PaperNest_API.Services;
+using PaperNest_API.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PaperNest_API.View
@@ -15,6 +16,7 @@ namespace PaperNest_API.View
         private readonly AuthStateMachine _authState;
         private User? _currentUser;
         private Workspace? _currentWorkspace;
+        private readonly CitationView _citationView; // Add this line
 
         public CLIView()
         {
@@ -25,6 +27,7 @@ namespace PaperNest_API.View
             _authState = new AuthStateMachine();
             _currentUser = null;
             _currentWorkspace = null;
+            _citationView = new CitationView(); // Initialize CitationView
         }
 
         public void Start()
@@ -510,7 +513,7 @@ namespace PaperNest_API.View
                 Console.WriteLine("Gagal membuat dokumen.");
             }
         }
-        
+
         // Menu untuk dokumen yang dipilih
         private void DocumentMenu(Document? document)
         {
@@ -519,9 +522,9 @@ namespace PaperNest_API.View
                 Console.WriteLine("Tidak ada dokumen yang dipilih.");
                 return;
             }
-            
+
             bool backToWorkspaceMenu = false;
-            
+
             while (!backToWorkspaceMenu)
             {
                 // Tampilkan informasi tentang draft jika ada
@@ -541,19 +544,26 @@ namespace PaperNest_API.View
                 Console.WriteLine($"Konten: {document?.Content ?? "Tidak ada konten"}");
                 Console.WriteLine($"Dibuat pada: {document?.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                 Console.WriteLine(draftInfo);
-                
+
                 Console.WriteLine("\n1. Edit Dokumen (Judul, Deskripsi)");
                 Console.WriteLine("2. Edit Konten Dokumen");
                 Console.WriteLine("3. Hapus Dokumen");
                 Console.WriteLine("4. Manajemen Versi Dokumen");
+                Console.WriteLine("5. Generate Citation"); // Added
                 Console.WriteLine("0. Kembali ke Menu Workspace");
                 Console.Write("Pilih menu: ");
-                
+
                 string? choice = Console.ReadLine();
-                
+
                 switch (choice)
                 {
                     case "1":
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+
                         EditDocumentMetadata(document);
                         // Refresh document data
                         var refreshResult = _documentController.GetDocumentById(document.Id);
@@ -564,6 +574,12 @@ namespace PaperNest_API.View
                         }
                         break;
                     case "2":
+                        if(document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+
                         EditDocumentContent(document);
                         // Refresh document data
                         var refreshContentResult = _documentController.GetDocumentById(document.Id);
@@ -574,6 +590,12 @@ namespace PaperNest_API.View
                         }
                         break;
                     case "3":
+                        if(document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+
                         if (DeleteDocument(document.Id))
                         {
                             backToWorkspaceMenu = true;
@@ -582,6 +604,15 @@ namespace PaperNest_API.View
                     case "4":
                         ManageDocumentVersions(document);
                         break;
+                    case "5": // Added
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+
+                        GenerateCitation(document);
+                        break;
                     case "0":
                         backToWorkspaceMenu = true;
                         break;
@@ -589,7 +620,7 @@ namespace PaperNest_API.View
                         Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
                         break;
                 }
-                
+
                 if (!backToWorkspaceMenu)
                 {
                     Console.WriteLine("\nTekan tombol apa saja untuk melanjutkan...");
@@ -598,7 +629,7 @@ namespace PaperNest_API.View
                 }
             }
         }
-        
+
         // Dikasih null checking (?) karena area input (pemanggilan kode di atas) berpotensi nilai null.
         // Method untuk mengedit metadata dokumen (judul, deskripsi, status)
         private void EditDocumentMetadata(Document? document)
@@ -1039,7 +1070,66 @@ namespace PaperNest_API.View
                 return false;
             }
         }
-        
+
+        private void GenerateCitation(Document document)
+        {
+            if (document == null)
+            {
+                Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Generate Citation ===");
+            Console.WriteLine("1. Tampilkan Sitasi");
+            Console.WriteLine("2. Tampilkan Bibliografi");
+            Console.WriteLine("3. Tampilkan Sitasi Text");
+            Console.Write("Pilih jenis format sitasi: ");
+
+            string? choice = Console.ReadLine();
+
+            if(_currentUser == null)
+            {
+                Console.WriteLine("Anda harus login terlebih dahulu.");
+                return;
+            }
+
+            var citation = new Citation(123, CitationType.JournalArticle, document.Title, author: _currentUser.Name, publicationInfo: ""); // Replace with actual publication info
+            /*
+             {
+                Id = 123,
+                Type = CitationType.JournalArticle,
+                Title = document.Title,
+                Author = _currentUser.Name,  // Replace with actual author logic
+                PublicationInfo = "Jurnal Ilmiah XYZ, Vol. 10, No. 1, pp. 45-60, 2023", // Make dynamic
+                PublicationDate = DateTime.Now, // Make dynamic
+                AccessDate = "2024-07-24", // Make dynamic
+                DOI = "10.1234/xyz.12345" // Make dynamic
+            };
+            */
+            var bibliography = new List<string>
+            {
+                $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.",
+                 // Add more bibliography entries as needed.
+            };
+            string citationText = $"{citation.Author} ({citation.PublicationDate?.Year}). {citation.Title}."; // Example, remove page section because it's non-existent
+
+            switch (choice)
+            {
+                case "1":
+                    _citationView.DisplayCitation(citation);
+                    break;
+                case "2":
+                    _citationView.DisplayBibliography(bibliography);
+                    break;
+                case "3":
+                    _citationView.DisplayCitationText(citationText);
+                    break;
+                default:
+                    Console.WriteLine("Pilihan tidak valid.");
+                    break;
+            }
+        }
+
         // Method untuk menghapus dokumen
         private bool DeleteDocument(Guid documentId)
         {
