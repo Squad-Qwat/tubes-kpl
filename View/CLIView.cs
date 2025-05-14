@@ -360,7 +360,8 @@ namespace PaperNest_API.View
             
             while (!backToMainMenu)
             {
-                Console.WriteLine($"\n=== Workspace: {_currentWorkspace.Name} ===");
+                // Ada peringatan kalau '_currentWorkspace' kemungkinan null, jadinya pakai '?'
+                Console.WriteLine($"\n=== Workspace: {_currentWorkspace?.Name} ===");
                 Console.WriteLine("1. Lihat Dokumen");
                 Console.WriteLine("2. Buat Dokumen Baru");
                 Console.WriteLine("3. Edit Info Workspace");
@@ -421,14 +422,14 @@ namespace PaperNest_API.View
             if (result is OkObjectResult okResult)
             {
                 dynamic? resultData = okResult.Value;
-                var documents = resultData?.data as IEnumerable<Document>;
-                
-                if (documents == null || !documents.Any())
+                // Sebelum perubahan: IEnumerable<Document>? documents = resultData?.data as IEnumerable<Document>;
+
+                if (resultData?.data is not IEnumerable<Document> documents || !documents.Any()) // Sebelum perubahan: 'documents == null || !documents.Any()'
                 {
                     Console.WriteLine("Belum ada dokumen di workspace ini.");
                     return;
                 }
-                
+
                 int index = 1;
                 foreach (var document in documents)
                 {
@@ -511,7 +512,7 @@ namespace PaperNest_API.View
         }
         
         // Menu untuk dokumen yang dipilih
-        private void DocumentMenu(Document document)
+        private void DocumentMenu(Document? document)
         {
             if (document == null)
             {
@@ -525,18 +526,20 @@ namespace PaperNest_API.View
             {
                 // Tampilkan informasi tentang draft jika ada
                 string draftInfo = "";
-                
-                if (document.HasDraft && document.LastEditedByUserId.HasValue)
+
+                // Kode ini kena peringatan karena ada potensi nilai null, jadi gw kasih null checking biar dia nggak null
+                if (document != null && document.HasDraft == true && document.LastEditedByUserId.HasValue)
                 {
                     var lastEditor = Repository.UserRepository.userRepository.FirstOrDefault(u => u.Id == document.LastEditedByUserId.Value);
                     string lastEditorName = lastEditor?.Name ?? "Pengguna lain";
                     draftInfo = $"\nAda draft tersedia (terakhir diedit oleh {lastEditorName} pada {document.LastEditedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "waktu tidak diketahui"})";
                 }
-                
-                Console.WriteLine($"\n=== Dokumen: {document.Title} ===");
-                Console.WriteLine($"Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
-                Console.WriteLine($"Konten: {document.Content ?? "Tidak ada konten"}");
-                Console.WriteLine($"Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+
+                // 'document' disini ada peringatan null, sehingga gw menggunakan '?'
+                Console.WriteLine($"\n=== Dokumen: {document?.Title} ===");
+                Console.WriteLine($"Deskripsi: {document?.Description ?? "Tidak ada deskripsi"}");
+                Console.WriteLine($"Konten: {document?.Content ?? "Tidak ada konten"}");
+                Console.WriteLine($"Dibuat pada: {document?.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                 Console.WriteLine(draftInfo);
                 
                 Console.WriteLine("\n1. Edit Dokumen (Judul, Deskripsi)");
@@ -596,8 +599,9 @@ namespace PaperNest_API.View
             }
         }
         
+        // Dikasih null checking (?) karena area input (pemanggilan kode di atas) berpotensi nilai null.
         // Method untuk mengedit metadata dokumen (judul, deskripsi, status)
-        private void EditDocumentMetadata(Document document)
+        private void EditDocumentMetadata(Document? document)
         {
             if (document == null)
             {
@@ -640,7 +644,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk mengedit konten dokumen
-        private void EditDocumentContent(Document document)
+        private void EditDocumentContent(Document? document)
         {
             if (document == null)
             {
@@ -709,7 +713,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk manajemen versi dokumen
-        private void ManageDocumentVersions(Document document)
+        private void ManageDocumentVersions(Document? document)
         {
             if (document == null)
             {

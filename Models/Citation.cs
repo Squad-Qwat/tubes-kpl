@@ -50,4 +50,27 @@ namespace PaperNest_API.Models
             return apaString;
         }
     }
+
+    // Model class required for controller class (move here so the controller class doesn't have to deal with the model directly)
+    public class CitationRequestModel
+    {
+        public CitationType Type { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string PublicationInfo { get; set; }
+        public DateTime? PublicationDate { get; set; }
+        public string? AccessDate { get; set; }
+        public string? DOI { get; set; }
+    }
+
+    public class CitationUpdateRequestModel
+    {
+        public CitationType? Type { get; set; }
+        public string? Title { get; set; }
+        public string? Author { get; set; }
+        public string? PublicationInfo { get; set; }
+        public DateTime? PublicationDate { get; set; }
+        public string? AccessDate { get; set; }
+        public string? DOI { get; set; }
+    }
 }

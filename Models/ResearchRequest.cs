@@ -49,4 +49,18 @@ namespace PaperNest_API.Models
             State.Process(this, result, reviewerComment);
         }
     }
+
+    // Models for request bodies (move here so the controller class doesn't have to deal with the model directly)
+    public class ResearchRequestCreateModel
+    {
+        public string Title { get; set; }
+        public string AbstractText { get; set; }
+        public string ResearcherName { get; set; }
+    }
+
+    public class ReviewRequestModel
+    {
+        public ReviewResult Result { get; set; }
+        public string? ReviewerComment { get; set; }
+    }
 }

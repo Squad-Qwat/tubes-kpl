@@ -1,11 +1,11 @@
 ﻿namespace PaperNest_API.Utils
 {
-    class AuthStateMachine
+    public class AuthStateMachine
     {
         public enum AuthState { BELUM_LOGIN, SUDAH_LOGIN };
         public enum Trigger { LOGIN, LOGOUT };
 
-        class Transition
+        public class Transition
         {
             public AuthState PrevState { get; }
             public AuthState NextState { get; }
