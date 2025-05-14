@@ -1,31 +1,29 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj": {}
+    "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj": {
+    "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj",
+        "projectUniqueName": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj",
         "projectName": "PaperNest_API",
-        "projectPath": "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj",
-        "packagesPath": "C:\\Users\\darrel\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\darrel\\Documents\\tubes-kpl\\obj\\",
+        "projectPath": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\darrel\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -66,6 +64,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.13, 8.0.13]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.13, 8.0.13]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.13, 8.0.13]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.13, 8.0.13]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"

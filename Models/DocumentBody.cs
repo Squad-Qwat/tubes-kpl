@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaperNest_API.Models
 {
-    public class DocumentBody
+    public class DocumentBody : BaseEntity
     {
-        [Key]
-        public Guid Id { get; private set; } = Guid.NewGuid();
 
         [Required]
         public bool IsCurrentVersion { get; set; }
@@ -15,8 +13,6 @@ namespace PaperNest_API.Models
         public string Content { get; set; } = string.Empty;
 
         public string VersionDescription { get; set; } = string.Empty;
-        
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public Guid ReviewId { get; set; } 
         

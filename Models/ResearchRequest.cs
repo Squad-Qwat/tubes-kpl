@@ -6,10 +6,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PaperNest_API.Models
 {
-    public class ResearchRequest
+    public class ResearchRequest : BaseEntity
     {
-        [Key]
-        public int Id { get; private set; }
 
         [Required]
         public string Title { get; set; }
@@ -24,7 +22,7 @@ namespace PaperNest_API.Models
         public virtual List<Review> Reviews { get; private set; } = new List<Review>();
 
 
-        public ResearchRequest(int id, string title, string abstractText, string researcherName)
+        public ResearchRequest(Guid id, string title, string abstractText, string researcherName)
         {
             Id = id;
             Title = title;

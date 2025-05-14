@@ -67,3 +67,14 @@ E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\re
 E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.pdb
 E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\PaperNest_API.genruntimeconfig.cache
 E:\Developed Code\Collage Code\Semester 4\PKPL\PaperNest_API\obj\Debug\net8.0\ref\PaperNest_API.dll
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.csproj.AssemblyReference.cache
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.GeneratedMSBuildEditorConfig.editorconfig
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.AssemblyInfoInputs.cache
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.AssemblyInfo.cs
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.csproj.CoreCompileInputs.cache
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.MvcApplicationPartsAssemblyInfo.cs
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.MvcApplicationPartsAssemblyInfo.cache
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.sourcelink.json
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.dll
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\refint\PaperNest_API.dll
+D:\Telkom Univ\Semester 4\Kontruksi Perangkat Lunak\Tugas Besar\tubes-kpl\obj\Debug\net8.0\PaperNest_API.pdb

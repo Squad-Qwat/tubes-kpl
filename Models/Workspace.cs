@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaperNest_API.Models
 {
-    public class Workspace
+    public class Workspace : BaseEntity
     {
-        [Key]
-        public Guid Id { get; private set; } = Guid.NewGuid();
 
         [Required, MaxLength(100)]
         public string Name { get; set; } = string.Empty;
@@ -18,10 +16,6 @@ namespace PaperNest_API.Models
         
         [ForeignKey("User_id")]
         public virtual User User { get; set; } = null!;
-
-        public DateTime Created_at { get; private set; } = DateTime.Now;
-
-        public DateTime Updated_at { get; set; }
 
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         

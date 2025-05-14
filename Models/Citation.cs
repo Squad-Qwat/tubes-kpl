@@ -2,9 +2,8 @@
 using System.Linq;
 namespace PaperNest_API.Models
 {
-    public class Citation
+    public class Citation : BaseEntity
     {
-        public int Id { get; private set; }
         public CitationType Type { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }

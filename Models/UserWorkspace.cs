@@ -4,11 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaperNest_API.Models
 {
-    public class UserWorkspace
+    public class UserWorkspace : BaseEntity
     {
-        [Key]
-        public Guid Id { get; private set; } = Guid.NewGuid();
-
         [Required]
         public Guid UserId { get; set; } 
 
@@ -19,6 +16,7 @@ namespace PaperNest_API.Models
         public RoleType Role { get; set; } = RoleType.Member;
 
         public List<Permissions> Permissions { get; set; } = new List<Permissions>();
+        public string Description { get; set; } = "Project Description";
         
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;

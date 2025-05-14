@@ -4,18 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaperNest_API.Models
 {
-    public class Review
+    public class Review : BaseEntity
     {
-        [Key]
-        public Guid Id { get; private set; } = Guid.NewGuid(); 
 
         public int ResearchRequestId { get; private set; }
         public string ReviewerName { get; private set; }
         public ReviewResult Result { get; private set; }
         public string Comment { get; private set; }
-        public DateTime ReviewDate { get; private set; }
 
-        
         public Review(int researchRequestId, string reviewerName, ReviewResult result, string comment)
         {
             ResearchRequestId = researchRequestId;
