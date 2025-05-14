@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc;
+using PaperNest_API.Services
 
 namespace PaperNest_API.Models
 {
@@ -34,16 +35,17 @@ namespace PaperNest_API.Models
         public string Name => "Under Review";
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {   
-            request.AddReview(new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
+        {
+            ResearchRequestManager manager = new(); // Setara dengan 'new ResearchRequestManager()'
+            manager.AddReview(request, new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
             {
                 case ReviewResult.Approved:
-                    request.ChangeState(new ApprovedState());
+                    manager.ChangeState(request, new ApprovedState());
                     break;
                 case ReviewResult.NeedsRevision:
-                    request.ChangeState(new NeedsRevisionState());
+                    manager.ChangeState(request, new NeedsRevisionState());
                     break;
                 default:
                     Console.WriteLine("Review result is still pending.");
@@ -73,10 +75,11 @@ namespace PaperNest_API.Models
     {
         public string Name => "Needs Revision";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {   
+        {
+            ResearchRequestManager manager = new(); // Setara dengan 'new ResearchRequestManager()'
             if (result == ReviewResult.Approved)
             {
-                request.ChangeState(new ApprovedState());
+                manager.ChangeState(request, new ApprovedState());
             } 
             else
             {

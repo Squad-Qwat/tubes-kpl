@@ -13,6 +13,8 @@ namespace PaperNest_API.View
         private readonly AuthController _authController;
         private readonly WorkspaceController _workspaceController;
         private readonly DocumentController _documentController;
+        private readonly ResearchRequestController _researchRequestController;
+        private readonly ResearchRequestManager _researchRequestManager;
         private readonly AuthStateMachine _authState;
         private User? _currentUser;
         private Workspace? _currentWorkspace;
@@ -24,6 +26,8 @@ namespace PaperNest_API.View
             _authController = new AuthController();
             _workspaceController = new WorkspaceController();
             _documentController = new DocumentController();
+            _researchRequestManager = new ResearchRequestManager();
+            _researchRequestController = new ResearchRequestController(); 
             _authState = new AuthStateMachine();
             _currentUser = null;
             _currentWorkspace = null;
@@ -575,9 +579,12 @@ namespace PaperNest_API.View
                 Console.WriteLine("Judul tidak boleh kosong!");
                 return;
             }
-            
-            var document = new Document
+
+            var id = Guid.NewGuid(); // Generate a new ID for the document
+
+            var document = new Document(id, title, _currentUser.Id, _currentWorkspace.Id)
             {
+                Id = id,
                 Title = title,
                 Description = description,
                 Content = content,
@@ -622,10 +629,10 @@ namespace PaperNest_API.View
                     draftInfo = $"\nAda draft tersedia (terakhir diedit oleh {lastEditorName} pada {document.LastEditedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "waktu tidak diketahui"})";
                 }
                 
-                Console.WriteLine($"\n=== Dokumen: {document.Title} ===");
-                Console.WriteLine($"Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
-                Console.WriteLine($"Konten: {document.Content ?? "Tidak ada konten"}");
-                Console.WriteLine($"Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine($"\n=== Dokumen: {document?.Title} ===");
+                Console.WriteLine($"Deskripsi: {document?.Description ?? "Tidak ada deskripsi"}");
+                Console.WriteLine($"Konten: {document?.Content ?? "Tidak ada konten"}");
+                Console.WriteLine($"Dibuat pada: {document?.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                 
                 if (_currentUser?.Role != "Dosen")
                 {
@@ -711,6 +718,15 @@ namespace PaperNest_API.View
                         }
 
                         GenerateCitation(document);
+                        break;
+                    case "6":
+                        // Added
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+                        SubmitDocumentForReview(document);
                         break;
                     case "0":
                         backToWorkspaceMenu = true;
@@ -1099,7 +1115,173 @@ namespace PaperNest_API.View
                 }
             }
         }
-        
+
+        // Method to submit a document for review (the "push" action)
+        private void SubmitDocumentForReview(Document? document)
+        {
+            if (_currentUser == null)
+            {
+                Console.WriteLine("Anda harus login terlebih dahulu.");
+                return;
+            }
+            if (document == null)
+            {
+                Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                return;
+            }
+
+            Console.WriteLine($"\n=== Ajukan Dokumen untuk Review: {document.Title} ===");
+            Console.WriteLine("Dokumen akan diajukan dengan konten draft saat ini (jika ada) atau konten aktif.");
+
+            Console.Write("Judul Pengajuan (kosongkan untuk menggunakan judul dokumen): ");
+            string? submissionTitle = Console.ReadLine();
+
+            Console.Write("Abstrak Pengajuan: ");
+            string? submissionAbstract = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(submissionAbstract))
+            {
+                Console.WriteLine("Abstrak pengajuan tidak boleh kosong.");
+                return;
+            }
+
+            var submissionDto = new ResearchRequestSubmissionDto
+            {
+                UserId = _currentUser.Id,
+                Title = string.IsNullOrWhiteSpace(submissionTitle) ? document.Title : submissionTitle,
+                AbstractText = submissionAbstract
+            };
+
+            var result = _documentController.SubmitDocumentForReview(document.Id, submissionDto);
+
+            if (result is CreatedAtActionResult createdResult)
+            {
+                dynamic? resultData = createdResult.Value;
+                Console.WriteLine($"Dokumen berhasil diajukan untuk review! Request ID: {resultData?.Id}");
+            }
+            else if (result is ObjectResult errorResult)
+            {
+                dynamic? errorData = errorResult.Value;
+                Console.WriteLine($"Gagal mengajukan dokumen untuk review: {errorData?.message}");
+            }
+            else
+            {
+                Console.WriteLine("Gagal mengajukan dokumen untuk review.");
+            }
+        }
+
+        // Method to view review requests (for lecturers)
+        private void ViewReviewRequests()
+        {
+            if (_currentUser == null || _currentUser.Role != "Dosen")
+            {
+                Console.WriteLine("Anda harus login sebagai dosen untuk melihat permintaan review.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Daftar Permintaan Review ===");
+
+            var result = _researchRequestController.GetAllRequests(); // Get all requests
+
+            List<ResearchRequest>? requests = null;
+            if (result is OkObjectResult okResult && okResult.Value is { } value && value.GetType().GetProperty("data")?.GetValue(value) is List<ResearchRequest> requestList)
+            {
+                requests = requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState).ToList();
+            }
+
+            if (requests == null || !requests.Any())
+            {
+                Console.WriteLine("Tidak ada permintaan review aktif.");
+                return;
+            }
+
+            int index = 1;
+            foreach (var req in requests)
+            {
+                Console.WriteLine($"{index}. Judul: {req.Title}");
+                Console.WriteLine($"   Peneliti: {req.ResearcherName}");
+                Console.WriteLine($"   Tanggal Pengajuan: {req.SubmissionDate.ToShortDateString()}");
+                Console.WriteLine($"   Keadaan: {req.State.Name}");
+                Console.WriteLine($"   ID Permintaan: {req.Id}");
+                Console.WriteLine();
+                index++;
+            }
+
+            Console.Write("Pilih permintaan review (nomor) untuk diproses atau 0 untuk kembali: ");
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= requests.Count())
+            {
+                var selectedRequest = requests.ElementAt(choice - 1);
+                ProcessReviewRequest(selectedRequest);
+            }
+        }
+
+        // Method to process a review request
+        private void ProcessReviewRequest(ResearchRequest request)
+        {
+            if (_currentUser == null || _currentUser.Role != "Dosen")
+            {
+                Console.WriteLine("Anda harus login sebagai dosen untuk memproses review.");
+                return;
+            }
+
+            Console.WriteLine($"\n=== Proses Review untuk: {request.Title} (Keadaan: {request.State.Name}) ===");
+            Console.WriteLine($"Abstrak: {request.Abstract}");
+            Console.WriteLine($"Konten yang diajukan:\n{request.DocumentBody.Content}"); // Show content for review
+
+            if (request.Reviews.Any())
+            {
+                Console.WriteLine("\n--- Riwayat Review Sebelumnya ---");
+                foreach (var review in request.Reviews)
+                {
+                    Console.WriteLine($"- Peninjau: {review.ReviewerName}, Hasil: {review.Result}, Komentar: {review.Comment}");
+                }
+            }
+
+            Console.WriteLine("\nPilih hasil review:");
+            Console.WriteLine("1. Disetujui (Approved)");
+            Console.WriteLine("2. Butuh Revisi (NeedsRevision)");
+            Console.WriteLine("3. Ditolak (Rejected)");
+            Console.Write("Pilihan: ");
+            string? resultChoice = Console.ReadLine();
+
+            ReviewResult reviewResult;
+            switch (resultChoice)
+            {
+                case "1": reviewResult = ReviewResult.Approved; break;
+                case "2": reviewResult = ReviewResult.NeedsRevision; break;
+                case "3": reviewResult = ReviewResult.Rejected; break;
+                default:
+                    Console.WriteLine("Pilihan tidak valid.");
+                    return;
+            }
+
+            Console.Write("Komentar Reviewer (opsional): ");
+            string? reviewerComment = Console.ReadLine();
+
+            var processReviewDto = new ProcessReviewDto
+            {
+                Result = reviewResult,
+                ReviewerId = _currentUser.Id,
+                ReviewerComment = reviewerComment ?? ""
+            };
+
+            var result = _researchRequestController.ProcessReview(request.Id, processReviewDto);
+
+            if (result is OkObjectResult)
+            {
+                Console.WriteLine("Review berhasil diproses!");
+            }
+            else if (result is ObjectResult errorResult)
+            {
+                dynamic? errorData = errorResult.Value;
+                Console.WriteLine($"Gagal memproses review: {errorData?.message}");
+            }
+            else
+            {
+                Console.WriteLine("Gagal memproses review.");
+            }
+        }
+
         // Method untuk mengedit workspace
         private void EditWorkspace()
         {

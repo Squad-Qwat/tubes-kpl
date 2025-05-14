@@ -10,73 +10,82 @@ namespace PaperNest_API.Models
     public class ResearchRequest : BaseEntity
     {
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } // Title of the submission
 
         [Required]
-        public string Abstract { get; set; }
+        public string Abstract { get; set; } // Abstract of the submission
 
         [Required]
-        public string ResearcherName { get; set; }
-        
-        public DateTime SubmissionDate { get; private set; }
-        public ReviewState State { get; private set; }
-        
+        public string ResearcherName { get; set; } // Submitter's name
+
+        public DateTime SubmissionDate { get; private set; } // When it was submitted
+        public ReviewState State { get; set; } // Current state of the review process
+
         [Required]
-        public Guid UserId { get; set; }
-        
+        public Guid UserId { get; set; } // User who submitted this request
+
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
-        
-        [Required]
-        public Guid DocumentBodyId { get; set; }
-        
-        [ForeignKey("DocumentBodyId")]
-        public virtual DocumentBody DocumentBody { get; set; } = null!;
-        
-        public virtual List<Review> Reviews { get; private set; } = new List<Review>();
 
-        // Konstruktor tanpa parameter untuk Entity Framework
+        // Link to the 'local' Document this request is about
+        [Required]
+        public Guid DocumentId { get; set; }
+
+        [ForeignKey("DocumentId")]
+        public virtual Document Document { get; set; } = null!;
+
+        // Link to the specific DocumentBody being proposed for review (the content of this submission)
+        [Required]
+        public Guid DocumentBodyId { get; set; } // This is the ID of the DocumentBody that is being submitted
+
+        [ForeignKey("DocumentBodyId")]
+        public virtual DocumentBody DocumentBody { get; set; } = null!; // The proposed content version
+
+        public virtual List<Review> Reviews { get; private set; } = new List<Review>(); // Collection of reviews for this request
+
+        // Constructor for Entity Framework
         protected ResearchRequest() { }
 
-        public ResearchRequest(Guid id, string title, string abstractText, string researcherName, Guid userId, Guid documentBodyId)
+        public ResearchRequest(Guid id, string title, string abstractText, string researcherName, Guid userId, Guid documentId, Guid documentBodyId)
         {
             Id = id;
             Title = title;
             Abstract = abstractText;
             ResearcherName = researcherName;
             UserId = userId;
+            DocumentId = documentId;
             DocumentBodyId = documentBodyId;
             SubmissionDate = DateTime.Now;
-            State = new SubmittedState();
-        }
-
-        public void ChangeState(ReviewState newState)
-        {
-            State = newState;
-        }
-
-        public void AddReview(Review review)
-        {
-            Reviews.Add(review);
-        }
-
-        public void ProcessReview(ReviewResult result, string reviewerComment = "")
-        {
-            State.Process(this, result, reviewerComment);
+            State = new SubmittedState(); // Initial state
+            Created_at = DateTime.Now;
+            Updated_at = DateTime.Now;
         }
     }
 
-    // Models for request bodies (move here so the controller class doesn't have to deal with the model directly)
-    public class ResearchRequestCreateModel
+    // DTO for adding a research request (used when a document is 'pushed' for review)
+    public class ResearchRequestDto
     {
+        [Required]
         public string Title { get; set; }
+        [Required]
         public string AbstractText { get; set; }
+        [Required]
         public string ResearcherName { get; set; }
+        [Required]
+        public Guid UserId { get; set; }
+        [Required]
+        public Guid DocumentId { get; set; } // The document being submitted
+        [Required]
+        public Guid DocumentBodyId { get; set; } // The specific content version being submitted
     }
 
-    public class ReviewRequestModel
+    // DTO for processing a review
+    public class ProcessReviewDto
     {
+        [Required]
         public ReviewResult Result { get; set; }
+        [Required]
+        public Guid ReviewerId { get; set; }
         public string? ReviewerComment { get; set; }
     }
 }

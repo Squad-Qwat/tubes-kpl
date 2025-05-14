@@ -1,6 +1,7 @@
 ﻿using PaperNest_API.Models;
 using PaperNest_API.Repository;
 using PaperNest_API.Views; // Karena pakai API, ini nggak kepakai
+using PaperNest_API.Services; // Jika ada service yang digunakan    
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,138 +159,161 @@ namespace PaperNest_API.Controllers
     */
 
     [ApiController]
-    [Route("api/research-requests")]
+    [Route("api/researchrequests")]
     public class ResearchRequestController : ControllerBase
     {
-        private static List<ResearchRequest> _requests = new List<ResearchRequest>(); //Yakin dibikin constant?
-        private static int _nextRequestId = 1;
-        private readonly static int _nextReviewId = 1; // Nggak kepakai?
+        // Now uses ResearchRequestManager to interact with requests.
+        // The manager internally uses a static list for mock data.
+        private readonly ResearchRequestManager _researchRequestManager;
 
-        [HttpPost]
-        public IActionResult AddRequest([FromBody] ResearchRequestCreateModel model)
+        public ResearchRequestController()
         {
+            _researchRequestManager = new ResearchRequestManager();
+        }
+
+        // POST: api/researchrequests (This will be called by DocumentController.SubmitDocumentForReview)
+        [HttpPost]
+        public IActionResult AddRequest([FromBody] ResearchRequestDto newRequestDto)
+        {
+            if (newRequestDto == null)
+            {
+                return BadRequest(new { message = "Permintaan tidak valid." });
+            }
+
+            // Ensure Document and DocumentBody exist for this submission
+            var document = DocumentService.GetById(newRequestDto.DocumentId);
+            if (document == null)
+            {
+                return BadRequest(new { message = $"Dokumen dengan ID {newRequestDto.DocumentId} tidak ditemukan." });
+            }
+
+            var documentBody = DocumentService.GetDocumentBodyById(newRequestDto.DocumentBodyId);
+            if (documentBody == null || documentBody.DocumentId != newRequestDto.DocumentId)
+            {
+                return BadRequest(new { message = $"Konten dokumen (DocumentBody) dengan ID {newRequestDto.DocumentBodyId} tidak valid untuk dokumen ini." });
+            }
+
             var newRequest = new ResearchRequest(
-                _nextRequestId++,
-                model.Title,
-                model.AbstractText,
-                model.ResearcherName
+                Guid.NewGuid(),
+                newRequestDto.Title,
+                newRequestDto.AbstractText,
+                newRequestDto.ResearcherName,
+                newRequestDto.UserId,
+                newRequestDto.DocumentId,
+                newRequestDto.DocumentBodyId
             );
-            _requests.Add(newRequest);
+
+            _researchRequestManager.AddResearchRequest(newRequest); // Use manager to add
 
             return CreatedAtAction(nameof(GetRequestById), new { id = newRequest.Id }, new
             {
-                message = $"Permintaan riset '{newRequest.Title}' berhasil ditambahkan",
+                message = "Permintaan riset berhasil ditambahkan",
                 data = newRequest
             });
         }
 
-        [HttpGet]
-        public IActionResult GetAllRequests()
-        {
-            return Ok(new
-            {
-                message = "Berhasil mendapatkan semua permintaan riset",
-                data = _requests
-            });
-        }
-
+        // GET: api/researchrequests/{id}
         [HttpGet("{id}")]
-        public IActionResult GetRequestById(int id)
+        public IActionResult GetRequestById(Guid id)
         {
-            if (id <= 0)
+            if (id == Guid.Empty)
             {
-                return BadRequest(new { message = "ID permintaan harus lebih dari 0." });
+                return BadRequest(new { message = "ID permintaan tidak valid." });
             }
 
-            var request = _requests.FirstOrDefault(r => r.Id == id);
+            var request = _researchRequestManager.GetResearchRequestById(id); // Use manager to get
 
             if (request == null)
             {
                 return NotFound(new { message = $"Permintaan dengan ID: {id} tidak ditemukan." });
             }
 
-            return Ok(new
-            {
-                message = $"Berhasil mendapatkan data permintaan riset '{request.Title}'",
-                data = request
-            });
+            return Ok(new { message = "Berhasil mendapatkan detail permintaan riset", data = request });
         }
 
-        [HttpPut("{id}/start-review")]
-        public IActionResult StartReview(int id)
+        // GET: api/researchrequests
+        [HttpGet]
+        public IActionResult GetAllRequests()
         {
-            var request = _requests.FirstOrDefault(r => r.Id == id);
+            var requests = _researchRequestManager.GetAllResearchRequests(); // Use manager to get all
 
+            if (requests.Count == 0)
+            {
+                return Ok(new { message = "Belum ada permintaan riset.", data = new List<ResearchRequest>() });
+            }
+            return Ok(new { message = "Berhasil mendapatkan semua permintaan riset", data = requests });
+        }
+
+        // GET: api/researchrequests/lecturer/{lecturerId}
+        [HttpGet("lecturer/{lecturerId}")]
+        public IActionResult GetRequestsByLecturer(Guid lecturerId)
+        {
+            if (lecturerId == Guid.Empty)
+            {
+                return BadRequest(new { message = "ID dosen tidak valid." });
+            }
+
+            // This logic might need to be refined if 'Reviews' only applies to the current request.
+            // Assuming Reviews on ResearchRequest still works for lecturer filtering.
+            var lecturerRequests = _researchRequestManager.GetAllResearchRequests()
+                                                        .Where(r => r.Reviews.Any(review => review.UserId == lecturerId)).ToList();
+
+            return Ok(new { message = $"Berhasil mendapatkan permintaan riset untuk dosen dengan ID: {lecturerId}", data = lecturerRequests });
+        }
+
+        // PUT: api/researchrequests/{requestId}/startreview
+        [HttpPut("{requestId}/startreview")]
+        public IActionResult StartReview(Guid requestId)
+        {
+            var request = _researchRequestManager.GetResearchRequestById(requestId);
             if (request == null)
             {
-                return NotFound(new { message = $"Permintaan riset dengan ID: {id} tidak ditemukan." });
+                return NotFound(new { message = $"Permintaan riset dengan ID: {requestId} tidak ditemukan." });
             }
 
             if (request.State is SubmittedState)
             {
-                request.ChangeState(new UnderReviewState());
-                return Ok(new
-                {
-                    message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang ditinjau.",
-                    data = request.State.Name
-                });
+                _researchRequestManager.ChangeState(request, new UnderReviewState());
+                return Ok(new { message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang ditinjau.", data = request });
             }
             else
             {
-                return BadRequest(new
-                {
-                    message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang tidak dalam keadaan untuk memulai peninjauan. Keadaan saat ini: {request.State.Name}",
-                    data = request.State.Name
-                });
+                return BadRequest(new { message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang tidak dalam keadaan untuk memulai peninjauan. Keadaan saat ini: {request.State.Name}" });
             }
         }
 
-        [HttpPut("{id}/process-review")]
-        public IActionResult ProcessReview(int id, [FromBody] ReviewRequestModel model)
+        // PUT: api/researchrequests/{requestId}/processreview
+        [HttpPut("{requestId}/processreview")]
+        public IActionResult ProcessReview(Guid requestId, [FromBody] ProcessReviewDto reviewDto)
         {
-            var request = _requests.FirstOrDefault(r => r.Id == id);
+            if (reviewDto == null)
+            {
+                return BadRequest(new { message = "Data review tidak valid." });
+            }
 
+            var request = _researchRequestManager.GetResearchRequestById(requestId);
             if (request == null)
             {
-                return NotFound(new { message = $"Permintaan riset dengan ID: {id} tidak ditemukan." });
+                return NotFound(new { message = $"Permintaan riset dengan ID: {requestId} tidak ditemukan." });
             }
 
-            if (request.State is UnderReviewState || request.State is NeedsRevisionState)
+            if (!(request.State is UnderReviewState || request.State is NeedsRevisionState))
             {
-                request.ProcessReview(model.Result, model.ReviewerComment);
-                return Ok(new
-                {
-                    message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) diproses. Keadaan saat ini: {request.State.Name}",
-                    data = request
-                });
-            }
-            else
-            {
-                return BadRequest(new
-                {
-                    message = $"Tidak bisa memproses permintaan untuk meninjau '{request.Title}' (ID: {request.Id}) dalam keadaan: {request.State.Name}",
-                    data = request.State.Name
-                });
-            }
-        }
-
-        // Menghapus request setelah request ditanggapi oleh sistem/ pemilik workspace
-        [HttpDelete("{id}")]
-        public IActionResult DeleteRequest(int id)
-        {
-            var requestToRemove = _requests.FirstOrDefault(r => r.Id == id);
-
-            if (requestToRemove == null)
-            {
-                return NotFound(new { message = $"Permintaan riset dengan ID: {id} tidak ditemukan." });
+                return BadRequest(new { message = $"Tidak bisa memproses permintaan untuk meninjau '{request.Title}' (ID: {request.Id}) dalam keadaan: {request.State.Name}" });
             }
 
-            _requests.Remove(requestToRemove);
-
-            return Ok(new
+            var reviewer = UserRepository.userRepository.FirstOrDefault(u => u.Id == reviewDto.ReviewerId);
+            if (reviewer == null)
             {
-                message = $"Permintaan riset dengan ID: {id} berhasil dihapus."
-            });
+                return NotFound(new { message = $"Peninjau dengan ID: {reviewDto.ReviewerId} tidak ditemukan." });
+            }
+
+            var review = new Review(request.Id, reviewDto.ReviewerId, reviewer.Name, reviewDto.Result, reviewDto.ReviewerComment ?? "");
+
+            _researchRequestManager.AddReview(request, review);
+            _researchRequestManager.ProcessReview(request, reviewDto.Result, reviewDto.ReviewerComment ?? "");
+
+            return Ok(new { message = "Proses review berhasil.", data = request });
         }
     }
 }

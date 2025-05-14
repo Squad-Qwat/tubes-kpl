@@ -5,27 +5,29 @@ namespace PaperNest_API.Models
 {
     public class DocumentBody : BaseEntity
     {
-
         [Required]
-        public bool IsCurrentVersion { get; set; }
+        public string Content { get; set; }
 
-        [Required] 
-        public string Content { get; set; } = string.Empty;
+        public string VersionDescription { get; set; } = "Initial version"; // Like a commit message
+        public bool IsCurrentVersion { get; set; } // Indicates if this DocumentBody is the active content for a Document
 
-        public string VersionDescription { get; set; } = string.Empty;
+        // Foreign key to the Document this body belongs to
+        [Required]
+        public Guid DocumentId { get; set; }
 
-        public Guid ReviewId { get; set; } = Guid.Empty;
-        
-        public Guid DocumentId { get; set; } 
-        
-        public bool IsReviewed { get; set; } = false;
-        
-        public ReviewResult? ReviewResult { get; set; }
-
-        [ForeignKey("ReviewId")]
-        public virtual Review Review { get; set; } = null!;
-        
         [ForeignKey("DocumentId")]
         public virtual Document Document { get; set; } = null!;
+
+        // Constructor for EF
+        protected DocumentBody() { }
+
+        public DocumentBody(string content, Guid documentId, string? versionDescription = null)
+        {
+            Id = Guid.NewGuid();
+            Content = content;
+            DocumentId = documentId;
+            VersionDescription = versionDescription ?? "New version";
+            IsCurrentVersion = true; // By default, newly created is current
+        }
     }
 }
