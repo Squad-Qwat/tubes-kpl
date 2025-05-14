@@ -7,12 +7,13 @@ namespace PaperNest_API.Models
     public class Review : BaseEntity
     {
 
-        public int ResearchRequestId { get; private set; }
+        public Guid ResearchRequestId { get; private set; }
         public string ReviewerName { get; private set; }
         public ReviewResult Result { get; private set; }
         public string Comment { get; private set; }
+        public DateTime ReviewDate { get; private set; }
 
-        public Review(int researchRequestId, string reviewerName, ReviewResult result, string comment)
+        public Review(Guid researchRequestId, string reviewerName, ReviewResult result, string comment)
         {
             ResearchRequestId = researchRequestId;
             ReviewerName = reviewerName;
@@ -21,9 +22,10 @@ namespace PaperNest_API.Models
             ReviewDate = DateTime.Now;
         }
 
-        public Review(int id, int researchRequestId, string reviewerName, ReviewResult result, string comment) :
+        public Review(Guid id, Guid researchRequestId, string reviewerName, ReviewResult result, string comment) :
             this(researchRequestId, reviewerName, result, comment)
         {
+            ReviewDate = DateTime.Now;
         }
 
         [ForeignKey("ResearchRequestId")]

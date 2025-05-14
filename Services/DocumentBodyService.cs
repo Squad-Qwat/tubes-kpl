@@ -26,7 +26,6 @@ namespace PaperNest_API.Services
                 Content = content,
                 IsCurrentVersion = true,
                 VersionDescription = description,
-                CreatedAt = DateTime.Now
             };
             
             _documentBodies.Add(newVersion);
@@ -37,7 +36,7 @@ namespace PaperNest_API.Services
         {
             return _documentBodies
                 .Where(db => db.DocumentId == documentId)
-                .OrderByDescending(db => db.CreatedAt)
+                .OrderByDescending(db => db.Created_at)
                 .ToList();
         }
         
@@ -61,7 +60,7 @@ namespace PaperNest_API.Services
             }
             
             // Buat versi baru berdasarkan konten versi sebelumnya
-            return CreateVersion(documentId, version.Content, $"Rollback to version from {version.CreatedAt}");
+            return CreateVersion(documentId, version.Content, $"Rollback to version from {version.Created_at}");
         }
     }
 }

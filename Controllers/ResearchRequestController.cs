@@ -7,12 +7,12 @@ namespace PaperNest_API.Controllers
     {
         private List<ResearchRequest> requests = new List<ResearchRequest>();
         private ResearchRequestView view = new ResearchRequestView();
-        private int nextRequestId = 1;
-        private int nextReviewId = 1;
+        private Guid nextRequestId = Guid.NewGuid();
+        private Guid nextReviewId = Guid.NewGuid();
 
         public void AddRequest(string title, string abstractText, string researcherName)
         {
-            var newRequest = new ResearchRequest(nextRequestId++, title, abstractText, researcherName);
+            var newRequest = new ResearchRequest(Guid.NewGuid(), title, abstractText, researcherName);
             requests.Add(newRequest);
             view.DisplayMessage($"Permintaan riset '{newRequest.Title}' berhasil ditambahkan dengan ID: {newRequest.Id}");
         }
@@ -25,7 +25,7 @@ namespace PaperNest_API.Controllers
                 {
                     throw new ArgumentNullException(nameof(id), "IS permintaan harus lebih dari 0.");
                 }
-                ResearchRequest? request = requests.FirstOrDefault(r => r.Id == id);
+                ResearchRequest? request = requests.FirstOrDefault(r => r.Id == Guid.NewGuid());
                 if (request == null)
                 {
                     throw new ArgumentNullException(nameof(request), $"Permintaan dengan ID: {id} tidak ada.");

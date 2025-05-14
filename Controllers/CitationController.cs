@@ -47,10 +47,10 @@ namespace PaperNest_API.Controllers
             // Add other citation types as needed
         };
 
-        public int AddCitation(CitationType type, string title, string author, string publicationInfo)
+        public Guid AddCitation(CitationType type, string title, string author, string publicationInfo)
         {
-            var newCitation = new Citation(_nextId++, type, title, author, publicationInfo);
-            _citations.Add(newCitation.Id, newCitation);
+            var newCitation = new Citation(Guid.NewGuid(), type, title, author, publicationInfo);
+            _citations.Add(_nextId++,newCitation);
             return newCitation.Id;
         }
 
