@@ -1,20 +1,12 @@
 import { Link } from 'react-router'
-import { Button } from '../../../components/ui/button'
+import { Button } from '../../../../components/ui/button'
 import { ArrowRight, Check, Mail, SendHorizonal } from 'lucide-react'
-import { InteractiveGridPattern } from '../../../components/magicui/interactive-grid-pattern'
-import { cn } from '../../../lib/utils'
-import { AuroraText } from '../../../components/magicui/aurora-text'
+import { AuroraText } from '../../../../components/magicui/aurora-text'
 
 function HeroSection() {
   return (
     <section className="overflow-hidden">
       <div className="relative mt-17 py-8 md:py-16 border-b z-10 bg-linear-to-tr from-slate-200 to-white">
-        <InteractiveGridPattern
-          width={100}
-          height={140}
-          className={cn('inset-x-0 mx-auto opacity-30')}
-          squaresClassName="hover:fill-primary"
-        />
         <div className="mx-auto max-w-6xl px-6">
           <div className="sm:mx-auto lg:mr-auto lg:mt-0 space-y-4 lg:space-y-8">
             <Link

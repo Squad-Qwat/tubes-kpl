@@ -1,20 +1,12 @@
-import NavbarAuth from './components/navbar-auth'
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-} from '../../components/ui/form'
-import { Input } from '../../components/ui/input'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { Button } from '../../components/ui/button'
-import { PasswordInput } from '../../components/ui/password'
-import { Link } from 'react-router'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Form, Link } from "react-router"
+import { z } from "zod"
+import NavbarAuth from "../../../components/common/navbar-auth"
+import { Button } from "../../../components/ui/button"
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form"
+import { Input } from "../../../components/ui/input"
+import { PasswordInput } from "../../../components/ui/password"
 
 const formSchema = z.object({
   email: z.string({
@@ -25,7 +17,7 @@ const formSchema = z.object({
   }),
 })
 
-function Signin() {
+function SigninPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   })
@@ -111,7 +103,7 @@ function Signin() {
             <p className="mt-6 text-accent-foreground text-center text-sm">
               New to Papernest?
               <Button asChild variant="link" className="px-2 text-sm">
-                <Link to="/auth/signup">Create Account</Link>
+                <Link to="/auth/join">Create Account</Link>
               </Button>
             </p>
 
@@ -158,4 +150,4 @@ function Signin() {
   )
 }
 
-export default Signin
+export default SigninPage

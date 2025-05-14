@@ -1,4 +1,4 @@
-import NavbarAuth from './components/navbar-auth'
+import NavbarAuth from '../../../components/common/navbar-auth'
 import {
   Form,
   FormField,
@@ -7,13 +7,13 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-} from '../../components/ui/form'
-import { Input } from '../../components/ui/input'
+} from '../../../components/ui/form'
+import { Input } from '../../../components/ui/input'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button } from '../../components/ui/button'
-import { PasswordInput } from '../../components/ui/password'
+import { Button } from '../../../components/ui/button'
+import { PasswordInput } from '../../../components/ui/password'
 import { Link } from 'react-router'
 
 const formSchema = z.object({
@@ -25,7 +25,7 @@ const formSchema = z.object({
   }),
 })
 
-function Signup() {
+function SignupPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   })
@@ -158,4 +158,4 @@ function Signup() {
   )
 }
 
-export default Signup
+export default SignupPage
