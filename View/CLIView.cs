@@ -415,10 +415,11 @@ namespace PaperNest_API.View
             }
             
             bool backToMainMenu = false;
-            
-            while (!backToMainMenu)
+
+            // Asumsi bahwa keadaan awal backToMainMenu selalu false
+            do
             {
-                Console.WriteLine($"\n=== Workspace: {_currentWorkspace.Name} ===");
+                Console.WriteLine($"\n=== Workspace: {_currentWorkspace?.Name} ===");
                 
                 // Tampilkan menu yang berbeda berdasarkan role
                 if (_currentUser?.Role == "Dosen")
@@ -494,7 +495,7 @@ namespace PaperNest_API.View
                     Console.ReadKey();
                     Console.Clear();
                 }
-            }
+            } while(!backToMainMenu) ;
         }
         
         // Method untuk melihat dokumen dalam workspace
@@ -536,7 +537,7 @@ namespace PaperNest_API.View
                     
                     Console.WriteLine($"{index}. {document.Title} {draftInfo}");
                     Console.WriteLine($"   Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
-                    Console.WriteLine($"   Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"   Dibuat pada: {document.Created_at:dd/MM/yyyy HH:mm:ss}"); // Setara dengan 'document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
                     Console.WriteLine();
                     index++;
                 }
@@ -1021,7 +1022,7 @@ namespace PaperNest_API.View
             int index = 1;
             foreach (var version in versions)
             {
-                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine($"{index}. Versi dari {version.Created_at:dd/MM/yyyy HH:mm:ss}"); // setara dengan 'version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
                 Console.WriteLine($"   {(version.IsCurrentVersion ? "[AKTIF]" : "")}");
                 Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
                 // Tampilkan preview konten (maksimal 50 karakter)
@@ -1051,7 +1052,7 @@ namespace PaperNest_API.View
             }
             
             Console.WriteLine($"\n=== Detail Versi {version.Id} ===");
-            Console.WriteLine($"Dibuat pada: {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+            Console.WriteLine($"Dibuat pada: {version.Created_at:dd/MM/yyyy HH:mm:ss}"); // setara dengan 'version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
             Console.WriteLine($"Status: {(version.IsCurrentVersion ? "Aktif" : "Tidak Aktif")}");
             Console.WriteLine($"Deskripsi: {version.VersionDescription}");
             Console.WriteLine("\nKonten:");
@@ -1196,7 +1197,7 @@ namespace PaperNest_API.View
             List<ResearchRequest>? requests = null;
             if (result is OkObjectResult okResult && okResult.Value is { } value && value.GetType().GetProperty("data")?.GetValue(value) is List<ResearchRequest> requestList)
             {
-                requests = requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState).ToList();
+                requests = [.. requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState)]; // Setara dengan ' requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState).ToList()'
             }
 
             if (requests == null || !requests.Any())
@@ -1599,11 +1600,23 @@ namespace PaperNest_API.View
                 // You might need to cast okResult.Value to an anonymous type or dictionary
                 // to access 'data', or define a specific response DTO for the controller.
                 // For simplicity, let's assume 'data' is directly accessible from the anonymous object.
+                if(okResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+
                 dynamic responseData = okResult.Value;
                 pendingRequests = responseData.data as List<ResearchRequest>;
             }
             else if (actionResult is NotFoundObjectResult notFoundResult)
             {
+                if(notFoundResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+
                 Console.WriteLine(notFoundResult.Value.GetType().GetProperty("message")?.GetValue(notFoundResult.Value));
                 return;
             }
@@ -1641,7 +1654,7 @@ namespace PaperNest_API.View
             }
         }
 
-private void ManageReviews()
+        private void ManageReviews()
         {
             Console.WriteLine("\n=== Kelola Review ===");
 
@@ -1653,6 +1666,13 @@ private void ManageReviews()
 
             if (actionResult is OkObjectResult okResult)
             {
+                if(okResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+                
+                // Assuming the 'data' property holds the list of ResearchRequest
                 dynamic responseData = okResult.Value;
                 pendingReviews = responseData.data as List<ResearchRequest>;
             }
@@ -1711,11 +1731,25 @@ private void ManageReviews()
                     var actionResult = controller.StartReview(request.Id);
                     if (actionResult is OkObjectResult okResult)
                     {
+                        if(okResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the success message
                         dynamic responseData = okResult.Value;
                         Console.WriteLine(responseData?.message); // Print success message from API
                     }
                     else if (actionResult is BadRequestObjectResult badRequestResult)
                     {
+                        if(badRequestResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the error message
                         dynamic errorData = badRequestResult.Value;
                         Console.WriteLine(errorData?.message); // Print error message from API
                     }
@@ -1740,7 +1774,7 @@ private void ManageReviews()
                     Console.Write("Masukkan komentar: ");
                     string? comment = Console.ReadLine() ?? "";
 
-                    ReviewResult result = ReviewResult.Approved;
+                    ReviewResult result = ReviewResult.Pending; // Logika untuk menentukan hasil review, nilai default karena isi dari if-else
 
                     switch (choice)
                     {
@@ -1755,6 +1789,12 @@ private void ManageReviews()
                             break;
                     }
 
+                    if(_currentUser == null)
+                    {
+                        Console.WriteLine("Pengguna tidak ditemukan.");
+                        return;
+                    }
+
                     // Create the DTO for ProcessReview
                     var reviewDto = new ProcessReviewDto
                     {
@@ -1766,16 +1806,37 @@ private void ManageReviews()
                     var actionResult = controller.ProcessReview(request.Id, reviewDto);
                     if (actionResult is OkObjectResult okResult)
                     {
+                        if(okResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the success message
                         dynamic responseData = okResult.Value;
                         Console.WriteLine(responseData?.message); // Print success message from API
                     }
                     else if (actionResult is BadRequestObjectResult badRequestResult)
                     {
+                        if (badRequestResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the error message
                         dynamic errorData = badRequestResult.Value;
                         Console.WriteLine(errorData?.message); // Print error message from API
                     }
                     else if (actionResult is NotFoundObjectResult notFoundResult)
                     {
+                        if (notFoundResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+
+                        // Assuming the 'message' property holds the error message
                         dynamic errorData = notFoundResult.Value;
                         Console.WriteLine(errorData?.message); // Print error message from API
                     }

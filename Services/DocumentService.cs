@@ -158,10 +158,6 @@ namespace PaperNest_API.Services
                 submissionDocumentBody.Id // Link to the specific DocumentBody of this submission
             );
 
-            // In a real app, this would add to a ResearchRequestRepository.
-            // For this mock, we'll need a static list for ResearchRequests too, or pass it to ResearchRequestManager.
-            // For now, let's assume ResearchRequestManager handles the persistence.
-            // Or, for the console demo, we can just return it and let the controller handle its mock storage.
             return researchRequest;
         }
     }

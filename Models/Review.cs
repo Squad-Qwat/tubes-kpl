@@ -18,7 +18,7 @@ namespace PaperNest_API.Models
         public string Comment { get; private set; } // Reviewer's comments
         public DateTime ReviewDate { get; private set; }
 
-        public 
+        public ReviewState State { get; private set; } // Current state of the review process
 
         // Constructor for EF
         protected Review() { }

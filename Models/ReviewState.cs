@@ -28,6 +28,13 @@ namespace PaperNest_API.Models
             {
                 Console.WriteLine($"Error: Cannot directly set to {result} from {Name}. Requires review first.");
             }
+            else
+            {
+                Console.WriteLine("Research request is submitted and pending review.");
+                // Change the state to Under Review
+                ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
+                manager.ChangeState(request, new UnderReviewState());
+            }
         }
     }
     public class UnderReviewState : ReviewState

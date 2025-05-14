@@ -164,11 +164,11 @@ namespace PaperNest_API.Controllers
     {
         // Now uses ResearchRequestManager to interact with requests.
         // The manager internally uses a static list for mock data.
-        private readonly ReviewService _researchRequestManager;
+        private readonly ReviewService _reviewManager;
 
         public ResearchRequestController()
         {
-            _researchRequestManager = new ReviewService();
+            _reviewManager = new ReviewService();
         }
 
         // POST: api/researchrequests (This will be called by DocumentController.SubmitDocumentForReview)
@@ -193,6 +193,11 @@ namespace PaperNest_API.Controllers
                 return BadRequest(new { message = $"Konten dokumen (DocumentBody) dengan ID {newRequestDto.DocumentBodyId} tidak valid untuk dokumen ini." });
             }
 
+            if(string.IsNullOrWhiteSpace(newRequestDto.Title) || string.IsNullOrWhiteSpace(newRequestDto.AbstractText) || string.IsNullOrWhiteSpace(newRequestDto.ResearcherName)
+            {
+                return BadRequest(new { message = "Judul, abstrak, dan nama mahasiswa tidak boleh kosong." });
+            }
+
             var newRequest = new ResearchRequest(
                 Guid.NewGuid(),
                 newRequestDto.Title,
@@ -203,7 +208,7 @@ namespace PaperNest_API.Controllers
                 newRequestDto.DocumentBodyId
             );
 
-            _researchRequestManager.AddResearchRequest(newRequest); // Use manager to add
+            _reviewManager.AddResearchRequest(newRequest); // Use manager to add
 
             return CreatedAtAction(nameof(GetRequestById), new { id = newRequest.Id }, new
             {
@@ -221,7 +226,7 @@ namespace PaperNest_API.Controllers
                 return BadRequest(new { message = "ID permintaan tidak valid." });
             }
 
-            var request = _researchRequestManager.GetResearchRequestById(id); // Use manager to get
+            var request = _reviewManager.GetResearchRequestById(id); // Use manager to get
 
             if (request == null)
             {
@@ -235,7 +240,7 @@ namespace PaperNest_API.Controllers
         [HttpGet]
         public IActionResult GetAllRequests()
         {
-            var requests = _researchRequestManager.GetAllResearchRequests(); // Use manager to get all
+            var requests = _reviewManager.GetAllResearchRequests(); // Use manager to get all
 
             if (requests.Count == 0)
             {
@@ -255,7 +260,7 @@ namespace PaperNest_API.Controllers
 
             // This logic might need to be refined if 'Reviews' only applies to the current request.
             // Assuming Reviews on ResearchRequest still works for lecturer filtering.
-            var lecturerRequests = _researchRequestManager.GetAllResearchRequests()
+            var lecturerRequests = _reviewManager.GetAllResearchRequests()
                                                         .Where(r => r.Reviews.Any(review => review.UserId == lecturerId)).ToList();
 
             return Ok(new { message = $"Berhasil mendapatkan permintaan riset untuk dosen dengan ID: {lecturerId}", data = lecturerRequests });
@@ -265,7 +270,7 @@ namespace PaperNest_API.Controllers
         [HttpPut("{requestId}/startreview")]
         public IActionResult StartReview(Guid requestId)
         {
-            var request = _researchRequestManager.GetResearchRequestById(requestId);
+            var request = _reviewManager.GetResearchRequestById(requestId);
             if (request == null)
             {
                 return NotFound(new { message = $"Permintaan riset dengan ID: {requestId} tidak ditemukan." });
@@ -273,7 +278,7 @@ namespace PaperNest_API.Controllers
 
             if (request.State is SubmittedState)
             {
-                _researchRequestManager.ChangeState(request, new UnderReviewState());
+                _reviewManager.ChangeState(request, new UnderReviewState());
                 return Ok(new { message = $"Permintaan riset '{request.Title}' (ID: {request.Id}) sedang ditinjau.", data = request });
             }
             else
@@ -291,7 +296,7 @@ namespace PaperNest_API.Controllers
                 return BadRequest(new { message = "Data review tidak valid." });
             }
 
-            var request = _researchRequestManager.GetResearchRequestById(requestId);
+            var request = _reviewManager.GetResearchRequestById(requestId);
             if (request == null)
             {
                 return NotFound(new { message = $"Permintaan riset dengan ID: {requestId} tidak ditemukan." });
@@ -310,8 +315,8 @@ namespace PaperNest_API.Controllers
 
             var review = new Review(request.Id, reviewDto.ReviewerId, reviewer.Name, reviewDto.Result, reviewDto.ReviewerComment ?? "");
 
-            _researchRequestManager.AddReview(request, review);
-            _researchRequestManager.ProcessReview(request, reviewDto.Result, reviewDto.ReviewerComment ?? "");
+            _reviewManager.AddReview(request, review);
+            _reviewManager.ProcessReview(request, reviewDto.Result, reviewDto.ReviewerComment ?? "");
 
             return Ok(new { message = "Proses review berhasil.", data = request });
         }

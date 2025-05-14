@@ -59,27 +59,30 @@ namespace PaperNest_API.Services
                 // The DocumentService should update the Document's CurrentDocumentBodyId
                 // to the DocumentBody that was submitted in this ResearchRequest.
                 var document = DocumentService.GetById(request.DocumentId);
-                if (document != null)
+                if (document == null)
                 {
-                    // Invalidate previous current version of the Document
-                    var previousCurrent = DocumentService.GetVersions(document.Id)
-                                                         .FirstOrDefault(db => db.IsCurrentVersion);
-                    if (previousCurrent != null)
-                    {
-                        previousCurrent.IsCurrentVersion = false;
-                    }
+                    Console.WriteLine($"Document with ID {request.DocumentId} not found.");
+                    return;
+                }
 
-                    // Set the submitted DocumentBody as the new CurrentDocumentBody for the Document
-                    var submittedBody = DocumentService.GetDocumentBodyById(request.DocumentBodyId);
-                    if (submittedBody != null)
-                    {
-                        submittedBody.IsCurrentVersion = true;
-                        document.CurrentDocumentBodyId = submittedBody.Id;
-                        document.LocalContentDraft = null; // Clear draft after merge
-                        document.HasDraft = false;
-                        document.Updated_at = DateTime.Now;
-                        // No need to call DocumentService.Update here as DocumentService operates on its own static list.
-                    }
+                // Invalidate previous current version of the Document
+                var previousCurrent = DocumentService.GetVersions(document.Id)
+                                                     .FirstOrDefault(db => db.IsCurrentVersion);
+                if (previousCurrent != null)
+                {
+                    previousCurrent.IsCurrentVersion = false;
+                }
+
+                // Set the submitted DocumentBody as the new CurrentDocumentBody for the Document
+                var submittedBody = DocumentService.GetDocumentBodyById(request.DocumentBodyId);
+                if (submittedBody != null)
+                {
+                    submittedBody.IsCurrentVersion = true;
+                    document.CurrentDocumentBodyId = submittedBody.Id;
+                    document.LocalContentDraft = null; // Clear draft after merge
+                    document.HasDraft = false;
+                    document.Updated_at = DateTime.Now;
+                    // No need to call DocumentService.Update here as DocumentService operates on its own static list.
                 }
             }
             else if (request.State is RejectedState)

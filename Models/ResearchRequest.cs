@@ -66,11 +66,11 @@ namespace PaperNest_API.Models
     public class ResearchRequestDto
     {
         [Required]
-        public string Title { get; set; }
+        public string? Title { get; set; }
         [Required]
-        public string AbstractText { get; set; }
+        public string? AbstractText { get; set; }
         [Required]
-        public string ResearcherName { get; set; }
+        public string? ResearcherName { get; set; }
         [Required]
         public Guid UserId { get; set; }
         [Required]

@@ -147,10 +147,8 @@ namespace PaperNest_API.Controllers
         private readonly Dictionary<int, Citation> _citations = []; // Setara dengan 'new Dictionary<int, Citation>()';
         private int _nextId = 1;
 
-        // Constructor to initialize with some dummy data if needed
         public CitationController()
         {
-            // Example initial data
             _citations.Add(_nextId++, new Citation(1, CitationType.Book, "Contoh Judul Buku", "Pengarang Buku", "Penerbit Contoh")
             {
                 PublicationDate = new DateTime(2020, 1, 15)
@@ -204,7 +202,6 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        // Helper method for the console app to add citations (not a direct API endpoint)
         public Citation? AddCitation(CitationType type, string title, string author, string publicationInfo, DateTime? publicationDate = null, string? accessDate = null, string? doi = null)
         {
             var newCitation = new Citation(_nextId++, type, title, author, publicationInfo)
@@ -215,7 +212,7 @@ namespace PaperNest_API.Controllers
             };
 
             _citations.Add(newCitation.Id, newCitation);
-            return newCitation; // Return the added citation for direct use in console
+            return newCitation;
         }
 
 
@@ -252,7 +249,6 @@ namespace PaperNest_API.Controllers
                 });
             }
 
-            // Apply updates only if the new value is provided
             if (model.Type.HasValue) existingCitation.Type = model.Type.Value;
             if (model.Title != null) existingCitation.Title = model.Title;
             if (model.Author != null) existingCitation.Author = model.Author;
@@ -268,7 +264,6 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        // Helper method for the console app to update citations (not a direct API endpoint)
         public Citation? UpdateCitation(int id, CitationType? type, string? title, string? author, string? publicationInfo, DateTime? publicationDate, string? accessDate, string? doi)
         {
             var existingCitation = GetCitation(id);
@@ -308,7 +303,6 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        // Helper method for the console app to delete citations (not a direct API endpoint)
         public bool EraseCitation(int id)
         {
             return _citations.Remove(id);
@@ -337,7 +331,6 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        // Helper method to get all citations for the console app
         public List<string> GetAllBibliographyItems()
         {
             var bibliography = new List<string>();
@@ -376,7 +369,6 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        // Helper method for the console app to get a single citation text
         public string GetCitationText(int id)
         {
             var citation = GetCitation(id);
@@ -387,8 +379,6 @@ namespace PaperNest_API.Controllers
             return CitationFormatter.GenerateAPAStyle(citation);
         }
 
-
-        // Make this method public so the console app can access it
         public Citation? GetCitation(int id)
         {
             return _citations.TryGetValue(id, out var citation) ? citation : null;

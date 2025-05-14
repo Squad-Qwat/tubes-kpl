@@ -13,7 +13,7 @@ namespace PaperNest_API
         {
             // Instantiate the ResearchRequestManager and pass it to the controller
             // In a real ASP.NET Core app, this would be handled by Dependency Injection (DI)
-            var researchRequestManager = new PaperNest_API.Services.ResearchRequestManager();
+            var researchRequestManager = new PaperNest_API.Services.ReviewService();
             var controller = new PaperNest_API.Controllers.ResearchRequestController(); // Controller now has a default constructor
 
             var consoleView = new PaperNest_API.Views.ResearchRequestView();
