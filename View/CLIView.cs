@@ -14,7 +14,7 @@ namespace PaperNest_API.View
         private readonly WorkspaceController _workspaceController;
         private readonly DocumentController _documentController;
         private readonly ResearchRequestController _researchRequestController;
-        private readonly ResearchRequestManager _researchRequestManager;
+        private readonly ReviewService _researchRequestManager;
         private readonly AuthStateMachine _authState;
         private User? _currentUser;
         private Workspace? _currentWorkspace;
@@ -26,7 +26,7 @@ namespace PaperNest_API.View
             _authController = new AuthController();
             _workspaceController = new WorkspaceController();
             _documentController = new DocumentController();
-            _researchRequestManager = new ResearchRequestManager();
+            _researchRequestManager = new ReviewService();
             _researchRequestController = new ResearchRequestController(); 
             _authState = new AuthStateMachine();
             _currentUser = null;
@@ -580,6 +580,7 @@ namespace PaperNest_API.View
                 return;
             }
 
+            /*
             var id = Guid.NewGuid(); // Generate a new ID for the document
 
             var document = new Document(id, title, _currentUser.Id, _currentWorkspace.Id)
@@ -592,7 +593,16 @@ namespace PaperNest_API.View
                 Workspace_id = _currentWorkspace.Id,
                 Updated_at = DateTime.Now
             };
-            
+            */
+
+            var document = new DocumentCreateDto
+            {
+                Title = title,
+                Description = description,
+                UserId = _currentUser.Id,
+                WorkspaceId = _currentWorkspace.Id
+            };
+
             var result = _documentController.CreateDocument(document);
             
             if (result is ObjectResult okResult && okResult.StatusCode >= 200 && okResult.StatusCode < 300)

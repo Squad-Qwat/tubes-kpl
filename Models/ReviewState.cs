@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc;
-using PaperNest_API.Services
+using PaperNest_API.Services;
 
 namespace PaperNest_API.Models
 {
@@ -36,7 +36,7 @@ namespace PaperNest_API.Models
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            ResearchRequestManager manager = new(); // Setara dengan 'new ResearchRequestManager()'
+            ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
             manager.AddReview(request, new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
@@ -76,7 +76,7 @@ namespace PaperNest_API.Models
         public string Name => "Needs Revision";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            ResearchRequestManager manager = new(); // Setara dengan 'new ResearchRequestManager()'
+            ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
             if (result == ReviewResult.Approved)
             {
                 manager.ChangeState(request, new ApprovedState());

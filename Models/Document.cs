@@ -64,7 +64,7 @@ namespace PaperNest_API.Models
     public class DocumentCreateDto
     {
         [Required]
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public string? Description { get; set; }
         public string? InitialContent { get; set; }
         [Required]

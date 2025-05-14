@@ -2,11 +2,11 @@
 
 namespace PaperNest_API.Services
 {
-    public class ResearchRequestManager
+    public class ReviewService
     {
         // This static list will act as a mock "repository" for ResearchRequests for the console test
         // In a real application, this would be an injected IResearchRequestRepository.
-        private static readonly List<ResearchRequest> _researchRequests = new List<ResearchRequest>();
+        private static readonly List<ResearchRequest> _researchRequests = []; // Setara dengan 'new List<ResearchRequest>()'
 
         public void AddResearchRequest(ResearchRequest request)
         {
@@ -70,6 +70,14 @@ namespace PaperNest_API.Services
                         // No need to call DocumentService.Update here as DocumentService operates on its own static list.
                     }
                 }
+            }
+            else if (request.State is RejectedState)
+            {
+                Console.WriteLine($"Research request {request.Id} has been rejected.");
+            }
+            else if (request.State is NeedsRevisionState)
+            {
+                Console.WriteLine($"Research request {request.Id} needs revision.");
             }
         }
     }

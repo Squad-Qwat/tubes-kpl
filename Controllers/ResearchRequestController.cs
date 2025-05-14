@@ -164,11 +164,11 @@ namespace PaperNest_API.Controllers
     {
         // Now uses ResearchRequestManager to interact with requests.
         // The manager internally uses a static list for mock data.
-        private readonly ResearchRequestManager _researchRequestManager;
+        private readonly ReviewService _researchRequestManager;
 
         public ResearchRequestController()
         {
-            _researchRequestManager = new ResearchRequestManager();
+            _researchRequestManager = new ReviewService();
         }
 
         // POST: api/researchrequests (This will be called by DocumentController.SubmitDocumentForReview)
