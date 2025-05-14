@@ -2,7 +2,7 @@
 
 namespace PaperNest_API.Models
 {
-    public class User
+    public class User : BaseEntity
     {
 
         [Required, MaxLength(100)]

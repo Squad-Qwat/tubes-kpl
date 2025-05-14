@@ -239,7 +239,7 @@ namespace PaperNest_API.View
             Console.WriteLine($"Email: {_currentUser.Email}");
             Console.WriteLine($"Username: {_currentUser.Username}");
             Console.WriteLine($"Role: {_currentUser.Role}");
-            Console.WriteLine($"Dibuat pada: {_currentUser.CreatedAt}");
+            Console.WriteLine($"Dibuat pada: {_currentUser.Created_at}");
         }
 
         // Method untuk membuat workspace baru
@@ -852,7 +852,7 @@ namespace PaperNest_API.View
             int index = 1;
             foreach (var version in versions)
             {
-                Console.WriteLine($"{index}. Versi dari {version.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                 Console.WriteLine($"   {(version.IsCurrentVersion ? "[AKTIF]" : "")}");
                 Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
                 // Tampilkan preview konten (maksimal 50 karakter)
@@ -882,7 +882,7 @@ namespace PaperNest_API.View
             }
             
             Console.WriteLine($"\n=== Detail Versi {version.Id} ===");
-            Console.WriteLine($"Dibuat pada: {version.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")}");
+            Console.WriteLine($"Dibuat pada: {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
             Console.WriteLine($"Status: {(version.IsCurrentVersion ? "Aktif" : "Tidak Aktif")}");
             Console.WriteLine($"Deskripsi: {version.VersionDescription}");
             Console.WriteLine("\nKonten:");
@@ -913,7 +913,7 @@ namespace PaperNest_API.View
             {
                 if (!version.IsCurrentVersion) // Tampilkan hanya versi non-aktif
                 {
-                    Console.WriteLine($"{index}. Versi dari {version.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                     Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
                     // Tampilkan preview konten (maksimal 50 karakter)
                     string contentPreview = version.Content.Length > 50 
@@ -930,7 +930,7 @@ namespace PaperNest_API.View
             {
                 var selectedVersion = versions.ElementAt(choice - 1);
                 
-                Console.Write($"Anda yakin ingin rollback ke versi dari {selectedVersion.CreatedAt}? (y/n): ");
+                Console.Write($"Anda yakin ingin rollback ke versi dari {selectedVersion.Created_at}? (y/n): ");
                 string? confirmation = Console.ReadLine();
                 
                 if (confirmation?.ToLower() == "y")

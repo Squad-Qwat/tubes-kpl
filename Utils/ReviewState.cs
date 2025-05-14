@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PaperNest_API.Models
+using PaperNest_API.Models;
+namespace PaperNest_API.Utils
 {
     /*
      * 'override' keyword hanya digunakan untuk superclass (termasuk abstract class) di C#, contoh:
