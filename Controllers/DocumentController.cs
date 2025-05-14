@@ -275,5 +275,60 @@ namespace PaperNest_API.Controllers
                 return StatusCode(500, new { message = "Gagal mengajukan dokumen untuk review: " + ex.Message });
             }
         }
-    }
+
+        // PUT: api/documents/{id}
+        [HttpPut("{id}")]
+        public IActionResult UpdateDocument(Guid id, [FromBody] dynamic documentUpdateDto)
+        {
+            var existingDocument = DocumentService.GetById(id);
+
+            if (existingDocument == null)
+            {
+                return NotFound(new { message = "Dokumen tidak ditemukan" });
+            }
+
+            // Check if the incoming DTO is for metadata update
+            if (documentUpdateDto.Title != null || documentUpdateDto.Description != null)
+            {
+                // Assuming DocumentUpdateMetadataDto would have these properties
+                // We can directly map if types are compatible or use a dedicated DTO and try to bind
+                if (documentUpdateDto.Title != null)
+                {
+                    existingDocument.Title = documentUpdateDto.Title;
+                }
+                if (documentUpdateDto.Description != null)
+                {
+                    existingDocument.Description = documentUpdateDto.Description;
+                }
+
+                DocumentService.Update(id, existingDocument);
+
+                return Ok(new
+                {
+                    message = "Metadata dokumen berhasil diperbarui",
+                    data = existingDocument
+                });
+            }
+            // Check if the incoming DTO is for content update
+            else if (documentUpdateDto.Content != null && documentUpdateDto.EditorId != null)
+            {
+                // Assuming DocumentUpdateContentDto would have these properties
+                existingDocument.LocalContentDraft = documentUpdateDto.Content;
+                existingDocument.HasDraft = true;
+                existingDocument.LastEditedByUserId = (Guid)documentUpdateDto.EditorId;
+                existingDocument.LastEditedAt = DateTime.Now;
+
+                DocumentService.Update(id, existingDocument);
+
+                return Ok(new
+                {
+                    message = "Konten dokumen (draft) berhasil diperbarui",
+                    data = existingDocument
+                });
+            }
+            else
+            {
+                return BadRequest(new { message = "Permintaan pembaruan tidak valid. Mohon berikan data metadata atau konten yang sesuai." });
+            }
+        }
 }

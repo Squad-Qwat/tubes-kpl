@@ -7,6 +7,7 @@ namespace PaperNest_API.Services
         // This static list will act as a mock "repository" for ResearchRequests for the console test
         // In a real application, this would be an injected IResearchRequestRepository.
         private static readonly List<ResearchRequest> _researchRequests = []; // Setara dengan 'new List<ResearchRequest>()'
+        private static readonly List<Review> _reviewRequest = []; // Setara dengan 'new List<Review>()'
 
         public void AddResearchRequest(ResearchRequest request)
         {
@@ -22,9 +23,19 @@ namespace PaperNest_API.Services
             return _researchRequests.FirstOrDefault(r => r.Id == id);
         }
 
+        public Review? GetReviewById(Guid id)
+        {
+            return _reviewRequest.FirstOrDefault(r => r.Id == id);
+        }
+
         public List<ResearchRequest> GetAllResearchRequests()
         {
             return _researchRequests;
+        }
+
+        public List<Review> GetAllReviews()
+        {
+            return _reviewRequest;
         }
 
         public void ChangeState(ResearchRequest request, ReviewState newState)

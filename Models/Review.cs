@@ -18,6 +18,8 @@ namespace PaperNest_API.Models
         public string Comment { get; private set; } // Reviewer's comments
         public DateTime ReviewDate { get; private set; }
 
+        public 
+
         // Constructor for EF
         protected Review() { }
 
