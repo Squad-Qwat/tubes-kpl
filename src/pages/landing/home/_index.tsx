@@ -10,7 +10,6 @@ function HomeLandingPage() {
       <Navbar/>
       <HeroSection/>
       <StatsSection/>
-      <ContentSection/>
       <Footer/>
     </>
   )

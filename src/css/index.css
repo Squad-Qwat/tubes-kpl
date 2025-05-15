@@ -2,106 +2,18 @@
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
 @custom-variant dark (&:is(.dark *));
-
 @plugin '@tailwindcss/typography';
 
-/* :root {
-  --background: hsl(0, 0%, 98%);
-  --foreground: oklch(0.14 0.00 285.86);
-  --card: oklch(1.00 0 0);
-  --card-foreground: oklch(0.14 0.00 285.86);
-  --popover: oklch(1.00 0 0);
-  --popover-foreground: oklch(0.14 0.00 285.86);
-  --primary: oklch(0.46 0.04 179.67);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.86 0.12 81.00);
-  --secondary-foreground: oklch(0.21 0.01 285.93);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.55 0.02 285.93);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.21 0.01 285.93);
-  --destructive: oklch(0.64 0.21 25.42);
-  --border: oklch(87.1% 0.006 286.286);
-  --input: oklch(0.92 0.00 286.61);
-  --ring: oklch(0.71 0.01 286.09);
-  --chart-1: oklch(0.65 0.22 36.85);
-  --chart-2: oklch(0.60 0.11 184.15);
-  --chart-3: oklch(0.40 0.07 227.18);
-  --chart-4: oklch(0.83 0.17 81.03);
-  --chart-5: oklch(0.77 0.17 65.36);
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.14 0.00 285.86);
-  --sidebar-primary: oklch(0.21 0.01 285.93);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.21 0.01 285.93);
-  --sidebar-border: oklch(0.92 0.00 286.61);
-  --sidebar-ring: oklch(0.71 0.01 286.09);
-
-  --radius: .5rem;
-  
-  --shadow-2xs: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.03);
-  --shadow-xs: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.03);
-  --shadow-sm: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.06), 0px 1px 2px 0px oklch(0.00 0 0 / 0.06);
-  --shadow: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.06), 0px 1px 2px 0px oklch(0.00 0 0 / 0.06);
-  --shadow-md: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.06), 0px 2px 4px 0px oklch(0.00 0 0 / 0.06);
-  --shadow-lg: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.06), 0px 4px 6px 0px oklch(0.00 0 0 / 0.06);
-  --shadow-xl: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.06), 0px 8px 10px 0px oklch(0.00 0 0 / 0.06);
-  --shadow-2xl: 0px 9px 12.5px 1px oklch(0.00 0 0 / 0.15);
-  
-} */
-
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #1461cc;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
-}
-
-.dark {
+  --radius: .5rem;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.62 0.19 260);
+  --primary:  oklch(81.1% 0.111 293.571);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -127,11 +39,9 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-optical-sizing: auto;
+  button { 
+    cursor: pointer;
+  }
 }
 
 @theme inline {
@@ -217,12 +127,81 @@
   }
 }
 
+@layer components {
+  /* Typography - Titles and Headings */
+  .title-1 {
+    @apply text-4xl font-mono tracking-tight font-medium uppercase md:text-6xl text-foreground text-balance
+  }
+
+  .title-2 {
+    @apply text-4xl font-mono tracking-tight uppercase font-medium lg:text-5xl text-foreground text-balance
+  }
+
+  .heading-1 {
+    @apply text-3xl uppercase font-mono tracking-tight font-semibold lg:text-4xl text-foreground text-balance
+  }
+
+  .heading-2 {
+    @apply text-2xl uppercase font-mono tracking-tight font-semibold lg:text-3xl text-foreground text-balance
+  }
+
+  .heading-3 {
+    @apply text-xl uppercase font-mono tracking-tight font-medium lg:text-2xl text-foreground text-balance
+  }
+
+  .heading-4 {
+    @apply text-lg uppercase font-mono tracking-tight font-medium text-foreground text-balance
+  }
+
+  /* Typography - Body Text */
+  .paragraph { 
+    @apply md:text-base font-mono tracking-tight text-sm font-normal text-muted-foreground text-balance
+  }
+
+  .paragraph-large {
+    @apply text-base font-mono tracking-tight md:text-lg font-normal text-muted-foreground text-balance
+  }
+
+  .paragraph-small {
+    @apply text-xs font-mono tracking-tight md:text-sm font-normal text-muted-foreground text-balance
+  }
+
+  /* Typography - Special Text */
+  .footnote {
+    @apply text-xs font-mono tracking-tight font-normal text-muted-foreground italic
+  }
+
+  .caption {
+    @apply text-xs font-mono tracking-tight font-medium text-muted-foreground
+  }
+
+  .label {
+    @apply text-sm font-mono tracking-tight font-medium text-foreground mb-2 block
+  }
+
+  .helper-text {
+    @apply text-xs font-mono tracking-tight text-muted-foreground mt-1
+  }
+
+  .error-text {
+    @apply text-xs font-mono tracking-tight text-destructive mt-1
+  }
+
+  .success-text {
+    @apply text-xs font-mono tracking-tight text-green-500 mt-1
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  label { 
+    @apply text-foreground
   }
 }
 

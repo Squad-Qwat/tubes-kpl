@@ -1,12 +1,12 @@
 function StatsSection() {
   return (
-    <section className="py-16 md:py-32">
-      <div className="mx-auto max-w-6xl space-y-8 px-6 md:space-y-12">
+    <section className="relative overflow-hidden px-4 sm:px-0">
+      <div className="mx-auto max-w-7xl py-8 md:py-32 border-x border-b space-y-8 px-6 md:space-y-12">
         <div className="relative z-10 max-w-xl space-y-6">
-          <h2 className="text-4xl uppercase font-medium lg:text-5xl">
+          <h2 className="title-2">
             The Gemini ecosystem brings together our models.
           </h2>
-          <p>
+          <p className="paragraph">
             Gemini is evolving to be more than just the models.{' '}
             <span className="font-medium">It supports an entire ecosystem</span>{' '}
             — from products innovate.
@@ -14,11 +14,17 @@ function StatsSection() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 md:gap-12 lg:gap-24">
           <div>
-            <p>
+            <p className="paragraph">
               It supports an entire ecosystem — from products to the APIs and
               platforms helping developers and businesses innovate
             </p>
-            <div className="mb-12 mt-12 grid grid-cols-2 gap-2 md:mb-0">
+            <div className="mb-12 mt-12 grid grid-cols-3 gap-2 md:mb-0">
+              <div className="space-y-4">
+                <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
+                  +1200
+                </div>
+                <p>Stars on GitHub</p>
+              </div>
               <div className="space-y-4">
                 <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
                   +1200

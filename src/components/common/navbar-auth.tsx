@@ -1,27 +1,26 @@
-import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router'
-import { Button } from '../../../components/ui/button'
+import { Button } from '../ui/button'
 
 function NavbarAuth() {
   return (
-    <nav className="bg-background/50 fixed z-20 w-full border-b backdrop-blur-3xl">
-      <div className="mx-auto max-w-6xl px-6 transition-all duration-300">
-        <div className="relative flex flex-wrap items-center justify-around gap-6 py-3 lg:gap-0 lg:py-4">
-          <div className="flex w-full items-center justify-between gap-12 lg:w-auto">
-            <Link
-              to="/"
-              aria-label="home"
-              className="flex items-center space-x-2 text-2xl font-black text-foreground font-sans uppercase"
-            >
-              PaperNest
-            </Link>
-          </div>
+    <nav className="w-full fixed top-0 z-10 border-b backdrop-blur-3xl">
+      <div className="px-6 transition-all duration-300">
+        <div className="relative flex items-center justify-center sm:justify-between gap-6 py-3 lg:gap-0 lg:py-4">
+          <Link
+            to="/"
+            aria-label="home"
+            className="text-2xl font-black text-foreground font-sans uppercase"
+          >
+            PaperNest
+          </Link>
 
-          <Button asChild variant="link" size="default">
-            <Link to="/">
-              <ArrowLeft/> Back to home
-            </Link>
-          </Button>
+          <div className="hidden sm:flex justify-end w-fit gap-3 md:w-fit font-mono tracking-tight text-foreground">
+            <Button asChild size="default">
+              <Link to="/auth/signin">
+                <span>Sign in</span>
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
