@@ -75,12 +75,12 @@ function Navbar() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="default">
-                <Link to="/auth/signin">
+                <Link to="/signin">
                   <span>Sign in</span>
                 </Link>
               </Button>
               <Button asChild size="default">
-                <Link to="/auth/join">
+                <Link to="/signup">
                   <span>Create Account</span>
                 </Link>
               </Button>

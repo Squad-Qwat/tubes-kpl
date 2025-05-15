@@ -5,7 +5,6 @@ import ErrorPage from '../pages/error/_index'
 import SigninPage from '../pages/landing/auth/sign-in'
 import SignupPage from '../pages/landing/auth/sign-up'
 
-
 const router = createBrowserRouter([
   {
     path: '/',
@@ -18,17 +17,12 @@ const router = createBrowserRouter([
       },
 
       {
-        path: '/',
-        children: [
-          {
-            path: '/auth/signin',
-            Component: SigninPage
-          },
-          {
-            path: '/auth/join',
-            Component: SignupPage
-          }
-        ]
+        path: '/signin',
+        Component: SigninPage,
+      },
+      {
+        path: '/signup',
+        Component: SignupPage,
       },
     ],
   },

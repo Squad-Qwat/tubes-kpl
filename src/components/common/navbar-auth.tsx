@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { Button } from '../ui/button'
+import { X } from 'lucide-react'
 
 function NavbarAuth() {
   return (
@@ -15,9 +16,9 @@ function NavbarAuth() {
           </Link>
 
           <div className="hidden sm:flex justify-end w-fit gap-3 md:w-fit font-mono tracking-tight text-foreground">
-            <Button asChild size="default">
-              <Link to="/auth/signin">
-                <span>Sign in</span>
+            <Button asChild size="default" variant="outline" className='rounded-full'>
+              <Link to="/">
+                <X className='size-4'/>
               </Link>
             </Button>
           </div>
