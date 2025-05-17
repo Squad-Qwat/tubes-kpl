@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { formSchema, type FormValues } from '../../../../helper/sign-in-schema'
 import { useEffect, useState } from 'react'
 import type { z } from 'zod'
+import { useNavigate } from 'react-router'
 
 function SigninForm() {
   const [passwordValue, setPasswordValue] = useState('')
@@ -23,6 +24,8 @@ function SigninForm() {
     hasLetter: false,
     hasNumber: false,
   })
+  const [error, setError] = useState(false)
+  const navigate = useNavigate()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -46,7 +49,19 @@ function SigninForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values)
+      if (!values.email || !values.password) {
+        setError(true)
+      }
+
+      const email = localStorage.getItem('paper_nest_email')
+      const password = localStorage.getItem('paper_nest_password')
+
+      if (
+        email === values.email &&
+        (password === values.password || password === values.confirmPassword)
+      ) {
+        navigate('/workspace')
+      }
     } catch (error) {
       console.error('Form submission error', error)
     }

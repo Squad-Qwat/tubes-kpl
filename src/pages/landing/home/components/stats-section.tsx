@@ -1,6 +1,6 @@
 function StatsSection() {
   return (
-    <section className="relative overflow-hidden px-4 sm:px-0">
+    <section className="relative overflow-hidden px-6 lg:px-0">
       <div className="mx-auto max-w-7xl py-8 md:py-32 border-x border-b space-y-8 px-6 md:space-y-12">
         <div className="relative z-10 max-w-xl space-y-6">
           <h2 className="title-2">

@@ -20,6 +20,8 @@ import { CheckIcon, XIcon } from 'lucide-react'
 import { PasswordInput } from '../../../../components/ui/password'
 import { Input } from '../../../../components/ui/input'
 import type { z } from 'zod'
+import { useNavigate } from 'react-router'
+import generateGuid from '../../../../helper/generate-guid'
 
 const steps = [
   { id: 'role', title: 'Choose role' },
@@ -36,6 +38,9 @@ function SignupForm() {
     hasLetter: false,
     hasNumber: false,
   })
+
+  const [error, setError] = useState(false)
+  const navigate = useNavigate()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,7 +79,22 @@ function SignupForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log('s')
+      if (!values.role || !values.email || !values.name || !values.password) {
+        setError(true)
+      } else {
+        setError(false)
+
+        localStorage.setItem('paper_nest_email', JSON.stringify(values.email))
+        localStorage.setItem('paper_nest_name', JSON.stringify(values.name))
+        localStorage.setItem(
+          'paper_nest_password',
+          JSON.stringify(values.password)
+        )
+        localStorage.setItem('paper_nest_token', JSON.stringify(generateGuid()))
+        localStorage.setItem('paper_nest_role', JSON.stringify(values.role))
+
+        navigate('/workspace')
+      }
     } catch (error) {
       console.error('Form submission error', error)
     }

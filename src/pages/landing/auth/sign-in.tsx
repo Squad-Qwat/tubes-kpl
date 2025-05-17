@@ -8,7 +8,7 @@ function SigninPage() {
   return (
     <>
       <NavbarAuth />
-      <section className="pt-20 md:pt-0 md:flex flex-col items-center min-h-screen relative z-0 bg-background">
+      <section className="-mt-16 sm:mt-0 md:pt-0 flex flex-col items-center min-h-screen relative z-0 bg-background">
         <div
           aria-hidden
           className="absolute -z-10 inset-0 isolate contain-strict"
@@ -18,7 +18,7 @@ function SigninPage() {
           <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
         </div>
         <div className="max-w-md m-auto h-fit w-full">
-          <div className="p-6 rounded-2xl space-y-6">
+          <div className="px-4 md:px-0 space-y-6">
             <div>
               <h1 className="mb-1 mt-4 heading-3">Sign in</h1>
               <p className="paragraph">Welcome back to Papernest!</p>

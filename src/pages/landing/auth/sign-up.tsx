@@ -1,13 +1,24 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import NavbarAuth from '../../../components/common/navbar-auth'
 import { Button } from '../../../components/ui/button'
 import SignupForm from './components/sign-up-form'
+import { useEffect } from 'react'
 
 function SignupPage() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('paper_nest_token')
+
+    if (token != null) {
+      navigate('/dashboard')
+    }
+  }, [navigate])
+
   return (
     <>
       <NavbarAuth />
-      <section className="grid items-center min-h-screen relative z-0 bg-background">
+      <section className="-mt-16 sm:mt-0 md:pt-0 flex flex-col items-center min-h-screen relative z-0 bg-background">
         <div
           aria-hidden
           className="absolute -z-10 inset-0 isolate contain-strict"
@@ -17,16 +28,16 @@ function SignupPage() {
           <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
         </div>
         <div className="max-w-md m-auto h-fit w-full">
-          <div className="space-y-6">
+          <div className="px-4 md:px-0 space-y-6">
             <div>
               <h1 className="mb-1 mt-4 heading-3">Join Papernest</h1>
               <p className="paragraph">Create account to write your docs</p>
             </div>
 
-            <SignupForm/>
+            <SignupForm />
           </div>
         </div>
-        <p className="text-accent-foreground text-center text-sm">
+        <p className="mb-6 text-accent-foreground text-center text-sm">
           Have an account?
           <Button asChild variant="link" className="px-2 text-sm">
             <Link to="/signin">Sign in</Link>

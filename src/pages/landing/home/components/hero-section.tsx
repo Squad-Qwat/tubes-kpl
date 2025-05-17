@@ -5,7 +5,7 @@ import GridLayout from '../../../../components/magicui/grid-layout'
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden px-4 sm:px-0">
+    <section className="relative overflow-hidden px-6 lg:px-0">
       <div className="mt-14 lg:mt-17">
         <div className="mx-auto max-w-7xl">
           <GridLayout
