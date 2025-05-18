@@ -21,7 +21,8 @@ import { PasswordInput } from '../../../../components/ui/password'
 import { Input } from '../../../../components/ui/input'
 import type { z } from 'zod'
 import { useNavigate } from 'react-router'
-import generateGuid from '../../../../helper/generate-guid'
+import AuthLocalStorage from '../../../../helper/auth'
+import { signUpUser } from '../../../../lib/service/auth-service'
 
 const steps = [
   { id: 'role', title: 'Choose role' },
@@ -77,26 +78,42 @@ function SignupForm() {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (!values.role || !values.email || !values.name || !values.password) {
         setError(true)
+        localStorage.setItem(AuthLocalStorage.status, String(error))
       } else {
         setError(false)
 
-        localStorage.setItem('paper_nest_email', JSON.stringify(values.email))
-        localStorage.setItem('paper_nest_name', JSON.stringify(values.name))
-        localStorage.setItem(
-          'paper_nest_password',
-          JSON.stringify(values.password)
-        )
-        localStorage.setItem('paper_nest_token', JSON.stringify(generateGuid()))
-        localStorage.setItem('paper_nest_role', JSON.stringify(values.role))
+        const response = await signUpUser({
+          name: values.name,
+          email: values.email,
+          password: values.confirmPassword,
+          role: values.role,
+        })
 
-        navigate('/workspace')
+        if (response && response.success ) {
+          localStorage.setItem(AuthLocalStorage.status, String(error))
+          localStorage.setItem(AuthLocalStorage.token, response.token!)
+
+          const user = {
+            name: values.name,
+            email: values.email
+          }
+          
+          localStorage.setItem(AuthLocalStorage.user, JSON.stringify(user))
+
+          navigate('/workspace')
+        } else {
+          console.error(
+            'Sign up failed: ',
+            response ? response.message : 'Unkown error'
+          )
+        }
       }
     } catch (error) {
-      console.error('Form submission error', error)
+      console.error('Form submission error or API error', error)
     }
   }
   return (
@@ -137,24 +154,24 @@ function SignupForm() {
                       defaultValue={field.value}
                       className="flex flex-col space-y-1"
                     >
-                      <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border border-border p-4">
+                      <FormItem className="flex items-center p-4 space-x-3 space-y-0 border rounded-md border-border">
                         <FormControl>
                           <RadioGroupItem value="student" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer flex justify-between items-center w-full">
+                        <FormLabel className="flex items-center justify-between w-full font-normal cursor-pointer">
                           <span>I'm working on personal projects</span>
-                          <span className="bg-accent text-white text-xs px-2 py-1 rounded">
+                          <span className="px-2 py-1 text-xs text-white rounded bg-accent">
                             Student
                           </span>
                         </FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border border-border p-4">
+                      <FormItem className="flex items-center p-4 space-x-3 space-y-0 border rounded-md border-border">
                         <FormControl>
                           <RadioGroupItem value="lecturer" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer flex justify-between items-center w-full">
+                        <FormLabel className="flex items-center justify-between w-full font-normal cursor-pointer">
                           <span>I'm working on review the paper</span>
-                          <span className="bg-fuchsia-100 text-fuchsia-700 text-xs px-2 py-1 rounded">
+                          <span className="px-2 py-1 text-xs rounded bg-fuchsia-100 text-fuchsia-700">
                             Lecturer
                           </span>
                         </FormLabel>
@@ -222,9 +239,9 @@ function SignupForm() {
                     <div className="mt-2 space-y-2">
                       <div className="flex items-center space-x-2 text-sm">
                         {passwordValidation.minLength ? (
-                          <CheckIcon className="h-4 w-4 text-green-500" />
+                          <CheckIcon className="w-4 h-4 text-green-500" />
                         ) : (
-                          <XIcon className="h-4 w-4 text-gray-500" />
+                          <XIcon className="w-4 h-4 text-gray-500" />
                         )}
                         <span
                           className={
@@ -238,9 +255,9 @@ function SignupForm() {
                       </div>
                       <div className="flex items-center space-x-2 text-sm">
                         {passwordValidation.hasLetter ? (
-                          <CheckIcon className="h-4 w-4 text-green-500" />
+                          <CheckIcon className="w-4 h-4 text-green-500" />
                         ) : (
-                          <XIcon className="h-4 w-4 text-gray-500" />
+                          <XIcon className="w-4 h-4 text-gray-500" />
                         )}
                         <span
                           className={
@@ -254,9 +271,9 @@ function SignupForm() {
                       </div>
                       <div className="flex items-center space-x-2 text-sm">
                         {passwordValidation.hasNumber ? (
-                          <CheckIcon className="h-4 w-4 text-green-500" />
+                          <CheckIcon className="w-4 h-4 text-green-500" />
                         ) : (
-                          <XIcon className="h-4 w-4 text-gray-500" />
+                          <XIcon className="w-4 h-4 text-gray-500" />
                         )}
                         <span
                           className={

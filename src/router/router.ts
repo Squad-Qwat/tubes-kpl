@@ -4,6 +4,7 @@ import HomePage from '../pages/landing/home/_index'
 import ErrorPage from '../pages/error/_index'
 import SigninPage from '../pages/landing/auth/sign-in'
 import SignupPage from '../pages/landing/auth/sign-up'
+import HomeWorkspacePage from '../pages/workspace/_index'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
         path: '/signup',
         Component: SignupPage,
       },
+
+      {
+        path: '/workspace',
+        Component: HomeWorkspacePage
+      }
     ],
   },
 ])

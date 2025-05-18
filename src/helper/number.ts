@@ -1,10 +1,8 @@
-function generateGuid() {
+function generateGuid() :string {
   const buf = new Uint8Array(16);
   crypto.getRandomValues(buf);
 
-  // Set versi ke 4
   buf[6] = (buf[6] & 0x0f) | 0x40;
-  // Set varian ke RFC 4122
   buf[8] = (buf[8] & 0x3f) | 0x80;
 
   const byteToHex = [];
@@ -36,4 +34,19 @@ function generateGuid() {
   );
 }
 
-export default generateGuid
+function generateRandomNumber() :string { 
+  const length = 6
+  let token = ''
+
+  const characters ='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const charactersLength = characters.length
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersLength)
+    token += characters.at(randomIndex)
+  }
+
+  return token
+}
+
+export { generateGuid, generateRandomNumber }
