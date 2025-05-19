@@ -1,11 +1,8 @@
-import Navbar from "../../components/common/navbar"
-
-function HomeWorkspacePage() { 
-    return ( 
-        <>
-        <Navbar/>
-        </>
-    )
+function Workspace() {
+  return (
+    <>
+    </>
+  );
 }
 
-export default HomeWorkspacePage
+export default Workspace;

@@ -7,8 +7,8 @@ function StatsSection() {
             The Gemini ecosystem brings together our models.
           </h2>
           <p className="paragraph">
-            Gemini is evolving to be more than just the models.{' '}
-            <span className="font-medium">It supports an entire ecosystem</span>{' '}
+            Gemini is evolving to be more than just the models.{" "}
+            <span className="font-medium">It supports an entire ecosystem</span>{" "}
             — from products innovate.
           </p>
         </div>
@@ -20,19 +20,19 @@ function StatsSection() {
             </p>
             <div className="mb-12 mt-12 grid grid-cols-3 gap-2 md:mb-0">
               <div className="space-y-4">
-                <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
+                <div className="bg-linear-to-r from-white to-zinc-900 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
                   +1200
                 </div>
                 <p>Stars on GitHub</p>
               </div>
               <div className="space-y-4">
-                <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
+                <div className="bg-linear-to-r from-white to-zinc-900 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
                   +1200
                 </div>
                 <p>Stars on GitHub</p>
               </div>
               <div className="space-y-4">
-                <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
+                <div className="bg-linear-to-r from-white to-zinc-900 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
                   +500
                 </div>
                 <p>Powered Apps</p>
@@ -63,7 +63,7 @@ function StatsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default StatsSection
+export default StatsSection;

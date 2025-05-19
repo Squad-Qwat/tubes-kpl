@@ -32,7 +32,7 @@ function HeroSection() {
                   </AuroraText>
                 </h1>
 
-                <p className="text-balance text-base md:text-lg">
+                <p className="paragraph-large">
                   Real-time collaboration for all documentation in Markdown
                 </p>
               </div>
@@ -62,7 +62,7 @@ function HeroSection() {
               </div>
 
               <div>
-                <ul className="list-inside justify-center space-y-1 text-xs sm:text-base flex flex-col items-center flex-wrap sm:flex-row gap-2 md:gap-4">
+                <ul className="list-inside justify-center space-y-1 text-xs sm:text-base flex flex-col items-center caption flex-wrap sm:flex-row gap-2 md:gap-4">
                   <li className="flex gap-x-2 items-center">
                     <Check className="size-4 text-green-700" />
                     Faster & Modern

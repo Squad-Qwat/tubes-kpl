@@ -1,8 +1,9 @@
-import { Outlet } from 'react-router'
+import { Outlet } from "react-router";
+import { SparklesCore } from "../components/sparkles";
 
 function MainLayout() {
   return (
-    <main className="relative overflow-hidden text-foreground text-base font-mono">
+    <main className="relative overflow-hidden z-40 w-full h-full text-foreground text-base font-mono">
       <div
         aria-hidden
         className="absolute -z-10 inset-0 isolate contain-strict"
@@ -13,7 +14,7 @@ function MainLayout() {
       </div>
       <Outlet />
     </main>
-  )
+  );
 }
 
-export default MainLayout
+export default MainLayout;

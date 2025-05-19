@@ -1,6 +1,5 @@
-import { useNavigate } from 'react-router'
-import { generateRandomNumber } from '../../helper/number'
-import AuthLocalStorage from '../../helper/auth'
+import { generateRandomNumber } from '../../helper/generator/number'
+import AuthLocalStorage from '../../helper/enums/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 const SIGN_UP_URL: string = API_BASE_URL + "/auth/signup"

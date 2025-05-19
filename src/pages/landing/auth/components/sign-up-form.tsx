@@ -14,14 +14,14 @@ import {
 } from '../../../../components/ui/radio-group'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { formSchema, type FormValues } from '../../../../helper/sign-up-schema'
+import { formSchema, type FormValues } from '../../../../helper/schema/sign-up-schema'
 import { cn } from '../../../../lib/utils'
 import { CheckIcon, XIcon } from 'lucide-react'
 import { PasswordInput } from '../../../../components/ui/password'
 import { Input } from '../../../../components/ui/input'
 import type { z } from 'zod'
 import { useNavigate } from 'react-router'
-import AuthLocalStorage from '../../../../helper/auth'
+import AuthLocalStorage from '../../../../helper/enums/auth'
 import { signUpUser } from '../../../../lib/service/auth-service'
 
 const steps = [

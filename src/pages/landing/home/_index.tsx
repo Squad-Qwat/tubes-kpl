@@ -1,9 +1,9 @@
-import Footer from "../../../components/common/footer"
-import Navbar from "../../../components/common/navbar"
+import Footer from "../../../components/common/footer/footer"
+import Navbar from "../../../components/common/navbar/navbar"
 import HeroSection from "./components/hero-section"
 import StatsSection from "./components/stats-section"
 
-function HomeLandingPage() {
+function Home() {
   return (
     <>
       <Navbar/>
@@ -14,4 +14,4 @@ function HomeLandingPage() {
   )
 }
 
-export default HomeLandingPage
+export default Home

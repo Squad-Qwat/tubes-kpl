@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router'
-import NavbarAuth from '../../../components/common/navbar-auth'
+import NavbarAuth from '../../../components/common/navbar/navbar-auth'
 import { Button } from '../../../components/ui/button'
 import SignupForm from './components/sign-up-form'
 import { useEffect } from 'react'

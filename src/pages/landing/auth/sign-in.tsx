@@ -1,4 +1,4 @@
-import NavbarAuth from '../../../components/common/navbar-auth'
+import NavbarAuth from '../../../components/common/navbar/navbar-auth'
 import { Link } from 'react-router'
 import { Button } from '../../../components/ui/button'
 import SigninForm from './components/sign-in-form'
