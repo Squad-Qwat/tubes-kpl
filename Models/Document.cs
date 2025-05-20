@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaperNest_API.Models
 {
-    public class Document
+    public class Document : BaseEntity
     {
-        [Key]
-        public Guid Id { get; private set; } = Guid.NewGuid();
 
         [Required, MaxLength(200)]
         public string Title { get; set; } = string.Empty;
@@ -23,9 +21,6 @@ namespace PaperNest_API.Models
         public Guid Workspace_id { get; set; }
         [ForeignKey("Workspace_id")]
         public virtual Workspace Workspace { get; set; } = null!;
-
-        public DateTime Created_at { get; private set; } = DateTime.Now;
-        public DateTime Updated_at { get; set; }
         
         // Tambahkan properti untuk melacak pengeditan
         public Guid? LastEditedByUserId { get; set; }

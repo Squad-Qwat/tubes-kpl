@@ -7,5 +7,7 @@ namespace PaperNest_API.Repository
         public static List<User> userRepository = new List<User>();
 
         public static List<Workspace> workspaceRepository = new List<Workspace>();   
+        
+        public static List<UserWorkspace> userWorkspaceRepository = new List<UserWorkspace>();
     }
 }

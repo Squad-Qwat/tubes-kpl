@@ -31,9 +31,8 @@
         public string Name => "Under Review";
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {
-            var reviewId = request.Reviews.Count + 1;
-            request.AddReview(new Review(reviewId, request.Id, "Peninjau", result, reviewerComment));
+        {   
+            request.AddReview(new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
             {
@@ -57,7 +56,7 @@
         public string Name => "Approved";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            Console.WriteLine("Menyetujui permintaan peninjauan.");
+            Console.WriteLine("Permintaan peninjauan telah disetujui.");
         }
     }
 
@@ -66,7 +65,7 @@
         public string Name => "Rejected";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
         {
-            Console.WriteLine("Permintaan peninjauan ditolak");
+            Console.WriteLine("Permintaan peninjauan telah ditolak.");
         }
     }
 
@@ -74,15 +73,11 @@
     {
         public string Name => "Needs Revision";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {
+        {   
             if (result == ReviewResult.Approved)
             {
                 request.ChangeState(new ApprovedState());
-            }
-            else if (result == ReviewResult.Rejected)
-            {
-                request.ChangeState(new RejectedState());
-            }
+            } 
             else
             {
                 Console.WriteLine($"Permintaan peninjauan masih direvisi atau sudah menerima hasil tinjauan lain: {result}");

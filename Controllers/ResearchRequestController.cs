@@ -1,5 +1,6 @@
 ﻿using PaperNest_API.Models;
 using PaperNest_API.Views;
+using PaperNest_API.Repository;
 
 namespace PaperNest_API.Controllers
 {
@@ -7,31 +8,30 @@ namespace PaperNest_API.Controllers
     {
         private List<ResearchRequest> requests = new List<ResearchRequest>();
         private ResearchRequestView view = new ResearchRequestView();
-        private int nextRequestId = 1;
-        private int nextReviewId = 1;
 
-        public void AddRequest(string title, string abstractText, string researcherName)
+        public void AddRequest(string title, string abstractText, string researcherName, Guid userId, Guid documentBodyId)
         {
-            var newRequest = new ResearchRequest(nextRequestId++, title, abstractText, researcherName);
+            var newRequest = new ResearchRequest(Guid.NewGuid(), title, abstractText, researcherName, userId, documentBodyId);
             requests.Add(newRequest);
             view.DisplayMessage($"Permintaan riset '{newRequest.Title}' berhasil ditambahkan dengan ID: {newRequest.Id}");
         }
 
-        public ResearchRequest? GetRequestById(int id)
+        public ResearchRequest? GetRequestById(Guid id)
         {
             try
             {
-                if (id <= 0)
+                if (id == Guid.Empty)
                 {
-                    throw new ArgumentNullException(nameof(id), "IS permintaan harus lebih dari 0.");
+                    throw new ArgumentNullException(nameof(id), "ID permintaan tidak valid.");
                 }
+                
                 ResearchRequest? request = requests.FirstOrDefault(r => r.Id == id);
+                
                 if (request == null)
                 {
                     throw new ArgumentNullException(nameof(request), $"Permintaan dengan ID: {id} tidak ada.");
                 }
-                // view.DisplayMessage($"Research request '{request.Title}' retrieved successfully.");
-                // view.DisplayRequestDetails(request);
+                
                 return request;
             }
             catch (ArgumentNullException ex)
@@ -41,7 +41,7 @@ namespace PaperNest_API.Controllers
             }
         }
 
-        public void StartReview(int requestId)
+        public void StartReview(Guid requestId)
         {
             var request = GetRequestById(requestId);
             if (request != null)
@@ -62,12 +62,29 @@ namespace PaperNest_API.Controllers
             }
         }
 
-        public void ProcessReview(int requestId, ReviewResult result, string reviewerComment = "")
+        public void ProcessReview(Guid requestId, ReviewResult result, Guid reviewerId, string reviewerComment = "")
         {
             var request = GetRequestById(requestId);
-            if (request != null && request.State is UnderReviewState || request.State is NeedsRevisionState)
+            if (request != null && (request.State is UnderReviewState || request.State is NeedsRevisionState))
             {
+                // Dapatkan reviewer dari repository
+                var reviewer = UserRepository.userRepository.FirstOrDefault(u => u.Id == reviewerId);
+                
+                if (reviewer == null)
+                {
+                    view.DisplayMessage($"Peninjau dengan ID: {reviewerId} tidak ditemukan.");
+                    return;
+                }
+                
+                // Buat objek review
+                var review = new Review(request.Id, reviewerId, reviewer.Name, result, reviewerComment);
+                
+                // Tambahkan review ke request
+                request.AddReview(review);
+                
+                // Proses review
                 request.ProcessReview(result, reviewerComment);
+                
                 view.DisplayRequestDetails(request);
             }
             else if (request != null)
@@ -80,7 +97,7 @@ namespace PaperNest_API.Controllers
             }
         }
 
-        public void DisplayRequest(int requestId)
+        public void DisplayRequest(Guid requestId)
         {
             var request = GetRequestById(requestId);
             if (request != null)
@@ -107,6 +124,17 @@ namespace PaperNest_API.Controllers
             {
                 view.DisplayMessage("Belum ada permintaan riset yang ditambahkan/ diantrikan.");
             }
+        }
+        
+        public List<ResearchRequest> GetRequestsByLecturer(Guid lecturerId)
+        {
+            // Dapatkan semua requests yang memiliki reviews dengan lecturer sebagai reviewer
+            return requests.Where(r => r.Reviews.Any(review => review.UserId == lecturerId)).ToList();
+        }
+
+        public List<ResearchRequest> GetAllRequests()
+        {
+            return requests;
         }
     }
 }

@@ -425,23 +425,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\darrel\\.nuget\\packages\\": {},
+    "C:\\Users\\ASUS\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj",
+      "projectUniqueName": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
       "projectName": "PaperNest_API",
-      "projectPath": "C:\\Users\\darrel\\Documents\\tubes-kpl\\PaperNest_API.csproj",
-      "packagesPath": "C:\\Users\\darrel\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\darrel\\Documents\\tubes-kpl\\obj\\",
+      "projectPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
+      "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+      "outputPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\darrel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

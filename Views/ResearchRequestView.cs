@@ -22,7 +22,7 @@ namespace PaperNest_API.Views
                     Console.WriteLine($"- Peninjau: {review.ReviewerName}");
                     Console.WriteLine($"- Hasil: {review.Result}");
                     Console.WriteLine($"- Komentar: {review.Comment}");
-                    Console.WriteLine($"- Tanggal: {review.ReviewDate}");
+                    Console.WriteLine($"- Tanggal: {review.Created_at}");
                 }
             }
             else
