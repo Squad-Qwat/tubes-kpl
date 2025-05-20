@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj": {}
+    "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj": {}
   },
   "projects": {
-    "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj": {
+    "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj",
+        "projectUniqueName": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
         "projectName": "PaperNest_API",
-        "projectPath": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\PaperNest_API.csproj",
+        "projectPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "D:\\Telkom Univ\\Semester 4\\Kontruksi Perangkat Lunak\\Tugas Besar\\tubes-kpl\\obj\\",
+        "outputPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -74,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -23,5 +23,7 @@ namespace PaperNest_API.Models
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<Workspace> Workspaces { get; set; } = new List<Workspace>();
         public virtual ICollection<UserWorkspace> UserWorkspaces { get; set; } = new List<UserWorkspace>();
+        public virtual ICollection<ResearchRequest> ResearchRequests { get; set; } = new List<ResearchRequest>();
+        public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

@@ -5,6 +5,7 @@ namespace PaperNest_API.Models
         Owner,
         Member,
         Mentor,
-        Guest
+        Guest,
+        Lecturer
     }
 }

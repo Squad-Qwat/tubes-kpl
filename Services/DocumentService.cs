@@ -7,27 +7,27 @@ namespace PaperNest_API.Services
     {
         public static void Create(Document document)
         {
-            DocumentRepository.documentList.Add(document);
+            DocumentRepository.documents.Add(document);
         }
 
         public static IEnumerable<Document> GetAll()
         {
-            return DocumentRepository.documentList;
+            return DocumentRepository.documents;
         }
 
         public static Document? GetById(Guid id)
         {
-            return DocumentRepository.documentList.FirstOrDefault(d => d.Id == id);
+            return DocumentRepository.documents.FirstOrDefault(d => d.Id == id);
         }
 
         public static IEnumerable<Document> GetByUserId(Guid userId)
         {
-            return DocumentRepository.documentList.Where(d => d.User_id == userId);
+            return DocumentRepository.documents.Where(d => d.User_id == userId);
         }
 
         public static IEnumerable<Document> GetByWorkspaceId(Guid workspaceId)
         {
-            return DocumentRepository.documentList.Where(d => d.Workspace_id == workspaceId);
+            return DocumentRepository.documents.Where(d => d.Workspace_id == workspaceId);
         }
 
         public static void Update(Guid id, Document document)
@@ -39,6 +39,9 @@ namespace PaperNest_API.Services
                 existingDocument.Title = document.Title;
                 existingDocument.Description = document.Description;
                 existingDocument.Content = document.Content;
+                existingDocument.HasDraft = document.HasDraft;
+                existingDocument.LastEditedByUserId = document.LastEditedByUserId;
+                existingDocument.LastEditedAt = document.LastEditedAt;
                 existingDocument.Updated_at = DateTime.Now;
             }
         }
@@ -49,7 +52,7 @@ namespace PaperNest_API.Services
 
             if (existingDocument != null)
             {
-                DocumentRepository.documentList.Remove(existingDocument);
+                DocumentRepository.documents.Remove(existingDocument);
             }
         }
     }
