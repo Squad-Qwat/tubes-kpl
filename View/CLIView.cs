@@ -89,9 +89,7 @@ namespace PaperNest_API.View
             else if (_currentUser?.Role == "Dosen")
             {
                 Console.WriteLine("1. Lihat Workspace");
-                Console.WriteLine("2. Lihat Permintaan Review");
-                Console.WriteLine("3. Kelola Review");
-                Console.WriteLine("4. Bergabung dengan Workspace");
+                Console.WriteLine("2. Bergabung dengan Workspace");
             }else{
                 Console.WriteLine("Role tidak dikenali. Silakan coba lagi.");
             }
@@ -125,7 +123,7 @@ namespace PaperNest_API.View
                     }
                     else if (_currentUser?.Role == "Dosen")
                     {
-                        ViewPendingReviews();
+                        JoinWorkspace();
                     }
                     else
                     {
@@ -136,20 +134,6 @@ namespace PaperNest_API.View
                     if (_currentUser?.Role == "Mahasiswa")
                     {
                         ManageWorkspaces();
-                    }
-                    else if (_currentUser?.Role == "Dosen")
-                    {
-                        ManageReviews();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Menu tidak valid untuk role Anda.");
-                    }
-                    break;
-                case "4":
-                    if (_currentUser?.Role == "Dosen")
-                    {
-                        JoinWorkspace();
                     }
                     else
                     {
@@ -618,6 +602,38 @@ namespace PaperNest_API.View
                     draftInfo = $"\nAda draft tersedia (terakhir diedit oleh {lastEditorName} pada {document.LastEditedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "waktu tidak diketahui"})";
                 }
                 
+                // Tambahkan informasi tentang status review terbaru
+                string reviewInfo = "";
+                var versions = DocumentBodyService.GetVersions(document.Id);
+                if (versions != null && versions.Any())
+                {
+                    var currentVersion = versions.FirstOrDefault(v => v.IsCurrentVersion);
+                    if (currentVersion != null && currentVersion.IsReviewed)
+                    {
+                        string statusText = "";
+                        switch (currentVersion.ReviewResult)
+                        {
+                            case ReviewResult.Approved:
+                                statusText = "DISETUJUI";
+                                break;
+                            case ReviewResult.Rejected:
+                                statusText = "DITOLAK";
+                                break;
+                            case ReviewResult.NeedsRevision:
+                                statusText = "PERLU REVISI";
+                                break;
+                            default:
+                                statusText = currentVersion.ReviewResult.ToString();
+                                break;
+                        }
+                        reviewInfo = $"\nVersi saat ini: [{statusText}] (Klik menu 'Lihat Versi Dokumen' untuk detail)";
+                    }
+                    else if (currentVersion != null)
+                    {
+                        reviewInfo = "\nVersi saat ini belum direview";
+                    }
+                }
+                
                 Console.WriteLine($"\n=== Dokumen: {document.Title} ===");
                 Console.WriteLine($"Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
                 Console.WriteLine($"Konten: {document.Content ?? "Tidak ada konten"}");
@@ -627,6 +643,9 @@ namespace PaperNest_API.View
                 {
                     Console.WriteLine(draftInfo);
                 }
+                
+                // Tampilkan info review untuk semua pengguna
+                Console.WriteLine(reviewInfo);
                 
                 // Tampilkan menu yang berbeda berdasarkan role
                 if (_currentUser?.Role == "Dosen")
@@ -986,7 +1005,33 @@ namespace PaperNest_API.View
             int index = 1;
             foreach (var version in versions)
             {
-                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                string reviewStatus = "";
+                // Cek apakah sudah di-review
+                if (version.IsReviewed && version.ReviewId != Guid.Empty)
+                {
+                    // Tampilkan hasil review dengan jelas
+                    switch (version.ReviewResult)
+                    {
+                        case ReviewResult.Approved:
+                            reviewStatus = "[DISETUJUI]";
+                            break;
+                        case ReviewResult.Rejected:
+                            reviewStatus = "[DITOLAK]";
+                            break;
+                        case ReviewResult.NeedsRevision:
+                            reviewStatus = "[PERLU REVISI]";
+                            break;
+                        default:
+                            reviewStatus = $"[{version.ReviewResult}]";
+                            break;
+                    }
+                }
+                else if (version.ReviewId == Guid.Empty)
+                {
+                    reviewStatus = "[BELUM DIREVIEW]";
+                }
+                
+                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")} {reviewStatus}");
                 Console.WriteLine($"   {(version.IsCurrentVersion ? "[AKTIF]" : "")}");
                 Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
                 // Tampilkan preview konten (maksimal 50 karakter)
@@ -1002,12 +1047,12 @@ namespace PaperNest_API.View
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= versions.Count())
             {
                 var selectedVersion = versions.ElementAt(choice - 1);
-                ViewVersionDetail(selectedVersion);
+                ViewVersionDetailWithReview(selectedVersion);
             }
         }
 
-        // Method untuk melihat detail versi
-        private void ViewVersionDetail(DocumentBody version)
+        // Method untuk melihat detail versi dengan review (jika ada)
+        private void ViewVersionDetailWithReview(DocumentBody version)
         {
             if (version == null)
             {
@@ -1021,76 +1066,97 @@ namespace PaperNest_API.View
             Console.WriteLine($"Deskripsi: {version.VersionDescription}");
             Console.WriteLine("\nKonten:");
             Console.WriteLine(version.Content);
-        }
-
-        // Method untuk rollback ke versi sebelumnya
-        private void RollbackDocumentVersion(Document document)
-        {
-            if (document == null)
+            
+            // Tampilkan informasi review jika ada
+            if (version.IsReviewed && version.ReviewId != Guid.Empty)
             {
-                Console.WriteLine("Tidak ada dokumen yang dipilih.");
-                return;
-            }
-            
-            Console.WriteLine($"\n=== Rollback Dokumen: {document.Title} ===");
-            
-            var versions = DocumentBodyService.GetVersions(document.Id);
-            
-            if (versions == null || !versions.Any())
-            {
-                Console.WriteLine("Belum ada versi dokumen untuk rollback.");
-                return;
-            }
-            
-            int index = 1;
-            foreach (var version in versions)
-            {
-                if (!version.IsCurrentVersion) // Tampilkan hanya versi non-aktif
+                Console.WriteLine("\n=== Hasil Review ===");
+                
+                // Tampilkan status review dengan format yang mudah dibaca
+                string statusReview = "";
+                switch (version.ReviewResult)
                 {
-                    Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
-                    Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
-                    // Tampilkan preview konten (maksimal 50 karakter)
-                    string contentPreview = version.Content.Length > 50 
-                        ? version.Content.Substring(0, 50) + "..." 
-                        : version.Content;
-                    Console.WriteLine($"   Preview: {contentPreview}");
-                    Console.WriteLine();
+                    case ReviewResult.Approved:
+                        statusReview = "DISETUJUI ✓";
+                        break;
+                    case ReviewResult.Rejected:
+                        statusReview = "DITOLAK ✗";
+                        break;
+                    case ReviewResult.NeedsRevision:
+                        statusReview = "PERLU REVISI !";
+                        break;
+                    default:
+                        statusReview = version.ReviewResult.ToString();
+                        break;
                 }
-                index++;
-            }
-            
-            Console.Write("Pilih versi untuk rollback (nomor) atau 0 untuk kembali: ");
-            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= versions.Count())
-            {
-                var selectedVersion = versions.ElementAt(choice - 1);
                 
-                Console.Write($"Anda yakin ingin rollback ke versi dari {selectedVersion.Created_at}? (y/n): ");
-                string? confirmation = Console.ReadLine();
+                Console.WriteLine($"Status: {statusReview}");
                 
-                if (confirmation?.ToLower() == "y")
+                // Ambil detail review dari ResearchRequest
+                var researchRequestController = new ResearchRequestController();
+                var requests = researchRequestController.GetAllRequests();
+                var request = requests.FirstOrDefault(r => r.Id == version.ReviewId);
+                
+                if (request != null && request.Reviews.Count > 0)
                 {
-                    var newVersion = DocumentBodyService.RollbackToVersion(document.Id, selectedVersion.Id);
-                    document.Content = newVersion.Content;
-                    document.Updated_at = DateTime.Now;
-                    
-                    var result = _documentController.UpdateDocument(document.Id, document);
-                    
-                    if (result is OkObjectResult)
+                    foreach (var review in request.Reviews)
                     {
-                        Console.WriteLine("Rollback berhasil!");
+                        Console.WriteLine($"\nReviewer: {review.ReviewerName}");
+                        Console.WriteLine($"Tanggal: {review.ReviewDate.ToString("dd/MM/yyyy HH:mm:ss")}");
+                        Console.WriteLine("Komentar:");
+                        Console.WriteLine("------------");
+                        Console.WriteLine(review.Comment);
+                        Console.WriteLine("------------");
                     }
-                    else
+                    
+                    // Tampilkan panduan untuk mahasiswa berdasarkan status review
+                    if (_currentUser?.Role == "Mahasiswa")
                     {
-                        Console.WriteLine("Gagal melakukan rollback.");
+                        Console.WriteLine("\nPanduan tindak lanjut:");
+                        switch (version.ReviewResult)
+                        {
+                            case ReviewResult.Approved:
+                                Console.WriteLine("Dokumen Anda telah disetujui. Anda dapat melanjutkan ke tahap berikutnya.");
+                                break;
+                            case ReviewResult.NeedsRevision:
+                                Console.WriteLine("Dokumen Anda memerlukan revisi. Silakan perbaiki sesuai komentar reviewer.");
+                                Console.WriteLine("Setelah selesai merevisi, buat versi baru untuk direview kembali.");
+                                break;
+                            case ReviewResult.Rejected:
+                                Console.WriteLine("Dokumen Anda ditolak. Harap lakukan perubahan signifikan sesuai komentar reviewer.");
+                                Console.WriteLine("Setelah selesai merevisi, buat versi baru untuk direview kembali.");
+                                break;
+                        }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Rollback dibatalkan.");
+                    Console.WriteLine("Detail review tidak tersedia.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\nVersi ini belum direview.");
+                
+                // Jika user adalah dosen, berikan opsi untuk review
+                if (_currentUser?.Role == "Dosen")
+                {
+                    Console.Write("\nApakah Anda ingin mereview versi ini? (y/n): ");
+                    string? choice = Console.ReadLine()?.ToLower();
+                    if (choice == "y")
+                    {
+                        ReviewVersion(version);
+                    }
+                }
+                // Jika mahasiswa, tampilkan pesan bahwa menunggu review
+                else if (_currentUser?.Role == "Mahasiswa")
+                {
+                    Console.WriteLine("Versi ini masih menunggu review dari dosen.");
+                    Console.WriteLine("Silakan hubungi dosen Anda untuk mempercepat proses review.");
                 }
             }
         }
-        
+
         // Method untuk mengedit workspace
         private void EditWorkspace()
         {
@@ -1382,171 +1448,6 @@ namespace PaperNest_API.View
         }
 
         // Tambahkan metode-metode baru untuk dosen
-        private void ViewPendingReviews()
-        {
-            Console.WriteLine("\n=== Permintaan Review Tertunda ===");
-            
-            var controller = new ResearchRequestController();
-            var pendingReviews = controller.GetRequestsByLecturer(_currentUser.Id);
-            
-            if (pendingReviews.Count == 0)
-            {
-                Console.WriteLine("Tidak ada permintaan review tertunda.");
-                return;
-            }
-            
-            foreach (var request in pendingReviews)
-            {
-                Console.WriteLine($"ID: {request.Id} | Judul: {request.Title} | Peneliti: {request.ResearcherName} | Status: {request.State.Name}");
-            }
-            
-            Console.Write("\nMasukkan ID permintaan untuk melihat detail (kosongkan untuk kembali): ");
-            string? input = Console.ReadLine();
-            
-            if (!string.IsNullOrEmpty(input) && Guid.TryParse(input, out Guid requestId))
-            {
-                var selectedRequest = pendingReviews.FirstOrDefault(r => r.Id == requestId);
-                if (selectedRequest != null)
-                {
-                    DisplayRequestDetails(selectedRequest);
-                }
-                else
-                {
-                    Console.WriteLine("Permintaan dengan ID tersebut tidak ditemukan.");
-                }
-            }
-        }
-
-        private void ManageReviews()
-        {
-            Console.WriteLine("\n=== Kelola Review ===");
-            
-            var controller = new ResearchRequestController();
-            var pendingReviews = controller.GetRequestsByLecturer(_currentUser.Id);
-            
-            if (pendingReviews.Count == 0)
-            {
-                Console.WriteLine("Tidak ada permintaan review tertunda.");
-                return;
-            }
-            
-            Console.WriteLine("Permintaan review yang tersedia:");
-            foreach (var request in pendingReviews)
-            {
-                Console.WriteLine($"ID: {request.Id} | Judul: {request.Title} | Peneliti: {request.ResearcherName} | Status: {request.State.Name}");
-            }
-            
-            Console.Write("\nMasukkan ID permintaan untuk mengelola review (kosongkan untuk kembali): ");
-            string? input = Console.ReadLine();
-            
-            if (!string.IsNullOrEmpty(input) && Guid.TryParse(input, out Guid requestId))
-            {
-                var selectedRequest = pendingReviews.FirstOrDefault(r => r.Id == requestId);
-                if (selectedRequest != null)
-                {
-                    ProcessReviewRequest(selectedRequest);
-                }
-                else
-                {
-                    Console.WriteLine("Permintaan dengan ID tersebut tidak ditemukan.");
-                }
-            }
-        }
-
-        private void ProcessReviewRequest(ResearchRequest request)
-        {
-            Console.WriteLine($"\n=== Proses Review untuk '{request.Title}' ===");
-            Console.WriteLine($"Status saat ini: {request.State.Name}");
-            
-            if (request.State is SubmittedState)
-            {
-                Console.WriteLine("1. Mulai review");
-                Console.WriteLine("0. Kembali");
-                
-                Console.Write("Pilihan: ");
-                string? choice = Console.ReadLine();
-                
-                if (choice == "1")
-                {
-                    var controller = new ResearchRequestController();
-                    controller.StartReview(request.Id);
-                }
-            }
-            else if (request.State is UnderReviewState || request.State is NeedsRevisionState)
-            {
-                Console.WriteLine("1. Setujui");
-                Console.WriteLine("2. Perlu revisi");
-                Console.WriteLine("3. Tolak");
-                Console.WriteLine("0. Kembali");
-                
-                Console.Write("Pilihan: ");
-                string? choice = Console.ReadLine();
-                
-                if (choice == "1" || choice == "2" || choice == "3")
-                {
-                    Console.Write("Masukkan komentar: ");
-                    string? comment = Console.ReadLine() ?? "";
-                    
-                    ReviewResult result = ReviewResult.Approved;
-                    
-                    switch (choice)
-                    {
-                        case "1":
-                            result = ReviewResult.Approved;
-                            break;
-                        case "2":
-                            result = ReviewResult.NeedsRevision;
-                            break;
-                        case "3":
-                            result = ReviewResult.Rejected;
-                            break;
-                    }
-                    
-                    var controller = new ResearchRequestController();
-                    controller.ProcessReview(request.Id, result, _currentUser.Id, comment);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Permintaan review dalam status {request.State.Name} tidak dapat diproses.");
-                Console.WriteLine("Tekan tombol apa saja untuk kembali...");
-                Console.ReadKey();
-            }
-        }
-
-        private void DisplayRequestDetails(ResearchRequest request)
-        {
-            Console.WriteLine($"\n=== Detail Permintaan ===");
-            Console.WriteLine($"ID: {request.Id}");
-            Console.WriteLine($"Judul: {request.Title}");
-            Console.WriteLine($"Abstrak: {request.Abstract}");
-            Console.WriteLine($"Penulis: {request.ResearcherName}");
-            Console.WriteLine($"Tanggal pengajuan: {request.SubmissionDate}");
-            Console.WriteLine($"Status: {request.State.Name}");
-            
-            // Tampilkan review yang sudah diberikan
-            if (request.Reviews.Count > 0)
-            {
-                Console.WriteLine("\n=== Review yang telah diberikan ===");
-                foreach (var review in request.Reviews)
-                {
-                    Console.WriteLine($"Reviewer: {review.ReviewerName}");
-                    Console.WriteLine($"Tanggal: {review.ReviewDate}");
-                    Console.WriteLine($"Hasil: {review.Result}");
-                    Console.WriteLine($"Komentar: {review.Comment}");
-                    Console.WriteLine("---------------------");
-                }
-            }
-            else
-            {
-                Console.WriteLine("\nBelum ada review yang diberikan.");
-            }
-            
-            Console.WriteLine("\nTekan tombol apa saja untuk kembali...");
-            Console.ReadKey();
-        }
-
-        // Method untuk dosen bergabung dengan workspace
         private void JoinWorkspace()
         {
             if (_currentUser == null)
@@ -1812,6 +1713,74 @@ namespace PaperNest_API.View
             else
             {
                 Console.WriteLine("\nGagal memperbarui status review pada dokumen.");
+            }
+        }
+
+        // Method untuk rollback ke versi sebelumnya
+        private void RollbackDocumentVersion(Document document)
+        {
+            if (document == null)
+            {
+                Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                return;
+            }
+            
+            Console.WriteLine($"\n=== Rollback Dokumen: {document.Title} ===");
+            
+            var versions = DocumentBodyService.GetVersions(document.Id);
+            
+            if (versions == null || !versions.Any())
+            {
+                Console.WriteLine("Belum ada versi dokumen untuk rollback.");
+                return;
+            }
+            
+            int index = 1;
+            foreach (var version in versions)
+            {
+                if (!version.IsCurrentVersion) // Tampilkan hanya versi non-aktif
+                {
+                    Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
+                    // Tampilkan preview konten (maksimal 50 karakter)
+                    string contentPreview = version.Content.Length > 50 
+                        ? version.Content.Substring(0, 50) + "..." 
+                        : version.Content;
+                    Console.WriteLine($"   Preview: {contentPreview}");
+                    Console.WriteLine();
+                }
+                index++;
+            }
+            
+            Console.Write("Pilih versi untuk rollback (nomor) atau 0 untuk kembali: ");
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= versions.Count())
+            {
+                var selectedVersion = versions.ElementAt(choice - 1);
+                
+                Console.Write($"Anda yakin ingin rollback ke versi dari {selectedVersion.Created_at}? (y/n): ");
+                string? confirmation = Console.ReadLine();
+                
+                if (confirmation?.ToLower() == "y")
+                {
+                    var newVersion = DocumentBodyService.RollbackToVersion(document.Id, selectedVersion.Id);
+                    document.Content = newVersion.Content;
+                    document.Updated_at = DateTime.Now;
+                    
+                    var result = _documentController.UpdateDocument(document.Id, document);
+                    
+                    if (result is OkObjectResult)
+                    {
+                        Console.WriteLine("Rollback berhasil!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Gagal melakukan rollback.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Rollback dibatalkan.");
+                }
             }
         }
     }

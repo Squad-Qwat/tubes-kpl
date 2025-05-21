@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj": {}
+    "E:\\Developed Code\\PaperNest_API\\PaperNest_API.csproj": {}
   },
   "projects": {
-    "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj": {
+    "E:\\Developed Code\\PaperNest_API\\PaperNest_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
+        "projectUniqueName": "E:\\Developed Code\\PaperNest_API\\PaperNest_API.csproj",
         "projectName": "PaperNest_API",
-        "projectPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\PaperNest_API.csproj",
+        "projectPath": "E:\\Developed Code\\PaperNest_API\\PaperNest_API.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "E:\\Developed Code\\Collage Code\\Semester 4\\KPL\\tubes-kpl\\obj\\",
+        "outputPath": "E:\\Developed Code\\PaperNest_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
