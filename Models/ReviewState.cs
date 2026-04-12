@@ -1,4 +1,8 @@
-﻿namespace PaperNest_API.Models
+﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc;
+using PaperNest_API.Services;
+
+namespace PaperNest_API.Models
 {
     /*
      * 'override' keyword hanya digunakan untuk superclass (termasuk abstract class) di C#, contoh:
@@ -22,7 +26,14 @@
         {
             if (result != ReviewResult.Pending)
             {
-                Console.WriteLine($"Error: Tidak bisa secara langsung diubah ke {result} dari {Name}. Perlu ditinjau terlebih dahulu.");
+                Console.WriteLine($"Error: Cannot directly set to {result} from {Name}. Requires review first.");
+            }
+            else
+            {
+                Console.WriteLine("Research request is submitted and pending review.");
+                // Change the state to Under Review
+                ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
+                manager.ChangeState(request, new UnderReviewState());
             }
         }
     }
@@ -31,22 +42,20 @@
         public string Name => "Under Review";
 
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {   
-            request.AddReview(new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
+        {
+            ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
+            manager.AddReview(request, new Review(Guid.NewGuid(), request.Id, "Reviewer", result, reviewerComment));
 
             switch (result)
             {
                 case ReviewResult.Approved:
-                    request.ChangeState(new ApprovedState());
-                    break;
-                case ReviewResult.Rejected:
-                    request.ChangeState(new RejectedState());
+                    manager.ChangeState(request, new ApprovedState());
                     break;
                 case ReviewResult.NeedsRevision:
-                    request.ChangeState(new NeedsRevisionState());
+                    manager.ChangeState(request, new NeedsRevisionState());
                     break;
                 default:
-                    Console.WriteLine("Hasil tinjauan masih dipertimbangkan.");
+                    Console.WriteLine("Review result is still pending.");
                     break;
             }
         }
@@ -73,14 +82,15 @@
     {
         public string Name => "Needs Revision";
         public void Process(ResearchRequest request, ReviewResult result, string reviewerComment)
-        {   
+        {
+            ReviewService manager = new(); // Setara dengan 'new  ReviewService()'
             if (result == ReviewResult.Approved)
             {
-                request.ChangeState(new ApprovedState());
+                manager.ChangeState(request, new ApprovedState());
             } 
             else
             {
-                Console.WriteLine($"Permintaan peninjauan masih direvisi atau sudah menerima hasil tinjauan lain: {result}");
+                Console.WriteLine($"Research request is still under revision or received another review result: {result}");
             }
         }
     }

@@ -2,6 +2,7 @@ using PaperNest_API.Controllers;
 using PaperNest_API.Models;
 using PaperNest_API.Utils;
 using PaperNest_API.Services;
+using PaperNest_API.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PaperNest_API.View
@@ -12,9 +13,12 @@ namespace PaperNest_API.View
         private readonly AuthController _authController;
         private readonly WorkspaceController _workspaceController;
         private readonly DocumentController _documentController;
+        private readonly ResearchRequestController _researchRequestController;
+        private readonly ReviewService _researchRequestManager;
         private readonly AuthStateMachine _authState;
         private User? _currentUser;
         private Workspace? _currentWorkspace;
+        private readonly CitationView _citationView; // Add this line
 
         public CLIView()
         {
@@ -22,9 +26,12 @@ namespace PaperNest_API.View
             _authController = new AuthController();
             _workspaceController = new WorkspaceController();
             _documentController = new DocumentController();
+            _researchRequestManager = new ReviewService();
+            _researchRequestController = new ResearchRequestController(); 
             _authState = new AuthStateMachine();
             _currentUser = null;
             _currentWorkspace = null;
+            _citationView = new CitationView(); // Initialize CitationView
         }
 
         public void Start()
@@ -408,10 +415,11 @@ namespace PaperNest_API.View
             }
             
             bool backToMainMenu = false;
-            
-            while (!backToMainMenu)
+
+            // Asumsi bahwa keadaan awal backToMainMenu selalu false
+            do
             {
-                Console.WriteLine($"\n=== Workspace: {_currentWorkspace.Name} ===");
+                Console.WriteLine($"\n=== Workspace: {_currentWorkspace?.Name} ===");
                 
                 // Tampilkan menu yang berbeda berdasarkan role
                 if (_currentUser?.Role == "Dosen")
@@ -487,7 +495,7 @@ namespace PaperNest_API.View
                     Console.ReadKey();
                     Console.Clear();
                 }
-            }
+            } while(!backToMainMenu) ;
         }
         
         // Method untuk melihat dokumen dalam workspace
@@ -506,14 +514,14 @@ namespace PaperNest_API.View
             if (result is OkObjectResult okResult)
             {
                 dynamic? resultData = okResult.Value;
-                var documents = resultData?.data as IEnumerable<Document>;
-                
-                if (documents == null || !documents.Any())
+                // Sebelum perubahan: IEnumerable<Document>? documents = resultData?.data as IEnumerable<Document>;
+
+                if (resultData?.data is not IEnumerable<Document> documents || !documents.Any()) // Sebelum perubahan: 'documents == null || !documents.Any()'
                 {
                     Console.WriteLine("Belum ada dokumen di workspace ini.");
                     return;
                 }
-                
+
                 int index = 1;
                 foreach (var document in documents)
                 {
@@ -529,7 +537,7 @@ namespace PaperNest_API.View
                     
                     Console.WriteLine($"{index}. {document.Title} {draftInfo}");
                     Console.WriteLine($"   Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
-                    Console.WriteLine($"   Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"   Dibuat pada: {document.Created_at:dd/MM/yyyy HH:mm:ss}"); // Setara dengan 'document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
                     Console.WriteLine();
                     index++;
                 }
@@ -572,9 +580,13 @@ namespace PaperNest_API.View
                 Console.WriteLine("Judul tidak boleh kosong!");
                 return;
             }
-            
-            var document = new Document
+
+            /*
+            var id = Guid.NewGuid(); // Generate a new ID for the document
+
+            var document = new Document(id, title, _currentUser.Id, _currentWorkspace.Id)
             {
+                Id = id,
                 Title = title,
                 Description = description,
                 Content = content,
@@ -582,7 +594,16 @@ namespace PaperNest_API.View
                 Workspace_id = _currentWorkspace.Id,
                 Updated_at = DateTime.Now
             };
-            
+            */
+
+            var document = new DocumentCreateDto
+            {
+                Title = title,
+                Description = description,
+                UserId = _currentUser.Id,
+                WorkspaceId = _currentWorkspace.Id
+            };
+
             var result = _documentController.CreateDocument(document);
             
             if (result is ObjectResult okResult && okResult.StatusCode >= 200 && okResult.StatusCode < 300)
@@ -594,34 +615,35 @@ namespace PaperNest_API.View
                 Console.WriteLine("Gagal membuat dokumen.");
             }
         }
-        
+
         // Menu untuk dokumen yang dipilih
-        private void DocumentMenu(Document document)
+        private void DocumentMenu(Document? document)
         {
             if (document == null)
             {
                 Console.WriteLine("Tidak ada dokumen yang dipilih.");
                 return;
             }
-            
+
             bool backToWorkspaceMenu = false;
-            
+
             while (!backToWorkspaceMenu)
             {
                 // Tampilkan informasi tentang draft jika ada
                 string draftInfo = "";
-                
-                if (document.HasDraft && document.LastEditedByUserId.HasValue)
+
+                // Kode ini kena peringatan karena ada potensi nilai null, jadi gw kasih null checking biar dia nggak null
+                if (document != null && document.HasDraft == true && document.LastEditedByUserId.HasValue)
                 {
                     var lastEditor = Repository.UserRepository.userRepository.FirstOrDefault(u => u.Id == document.LastEditedByUserId.Value);
                     string lastEditorName = lastEditor?.Name ?? "Pengguna lain";
                     draftInfo = $"\nAda draft tersedia (terakhir diedit oleh {lastEditorName} pada {document.LastEditedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "waktu tidak diketahui"})";
                 }
                 
-                Console.WriteLine($"\n=== Dokumen: {document.Title} ===");
-                Console.WriteLine($"Deskripsi: {document.Description ?? "Tidak ada deskripsi"}");
-                Console.WriteLine($"Konten: {document.Content ?? "Tidak ada konten"}");
-                Console.WriteLine($"Dibuat pada: {document.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine($"\n=== Dokumen: {document?.Title} ===");
+                Console.WriteLine($"Deskripsi: {document?.Description ?? "Tidak ada deskripsi"}");
+                Console.WriteLine($"Konten: {document?.Content ?? "Tidak ada konten"}");
+                Console.WriteLine($"Dibuat pada: {document?.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
                 
                 if (_currentUser?.Role != "Dosen")
                 {
@@ -647,71 +669,84 @@ namespace PaperNest_API.View
                 }
                 
                 Console.Write("Pilih menu: ");
-                
+
                 string? choice = Console.ReadLine();
-                
-                if (_currentUser?.Role == "Dosen")
+
+                switch (choice)
                 {
-                    // Opsi terbatas untuk dosen
-                    switch (choice)
-                    {
-                        case "1":
-                            ViewDocumentVersions(document.Id);
+                    case "1":
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
                             break;
-                        case "2":
-                            ReviewDocumentVersions(document.Id);
+                        }
+
+                        EditDocumentMetadata(document);
+                        // Refresh document data
+                        var refreshResult = _documentController.GetDocumentById(document.Id);
+                        if (refreshResult is OkObjectResult okResult)
+                        {
+                            dynamic? resultData = okResult.Value;
+                            document = resultData?.data as Document;
+                        }
+                        break;
+                    case "2":
+                        if(document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
                             break;
-                        case "0":
+                        }
+
+                        EditDocumentContent(document);
+                        // Refresh document data
+                        var refreshContentResult = _documentController.GetDocumentById(document.Id);
+                        if (refreshContentResult is OkObjectResult contentOkResult)
+                        {
+                            dynamic? resultData = contentOkResult.Value;
+                            document = resultData?.data as Document;
+                        }
+                        break;
+                    case "3":
+                        if(document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                            break;
+                        }
+
+                        if (DeleteDocument(document.Id))
+                        {
                             backToWorkspaceMenu = true;
+                        }
+                        break;
+                    case "4":
+                        ManageDocumentVersions(document);
+                        break;
+                    case "5": // Added
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
                             break;
-                        default:
-                            Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
+                        }
+
+                        GenerateCitation(document);
+                        break;
+                    case "6":
+                        // Added
+                        if (document == null)
+                        {
+                            Console.WriteLine("Tidak ada dokumen yang dipilih.");
                             break;
-                    }
+                        }
+                        SubmitDocumentForReview(document);
+                        break;
+                    case "0":
+                        backToWorkspaceMenu = true;
+                        break;
+                    default:
+                        Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
+                        break;
                 }
-                else
-                {
-                    // Opsi lengkap untuk mahasiswa
-                    switch (choice)
-                    {
-                        case "1":
-                            EditDocumentMetadata(document);
-                            // Refresh document data
-                            var refreshResult = _documentController.GetDocumentById(document.Id);
-                            if (refreshResult is OkObjectResult okResult)
-                            {
-                                dynamic? resultData = okResult.Value;
-                                document = resultData?.data as Document;
-                            }
-                            break;
-                        case "2":
-                            EditDocumentContent(document);
-                            // Refresh document data
-                            var refreshContentResult = _documentController.GetDocumentById(document.Id);
-                            if (refreshContentResult is OkObjectResult contentOkResult)
-                            {
-                                dynamic? resultData = contentOkResult.Value;
-                                document = resultData?.data as Document;
-                            }
-                            break;
-                        case "3":
-                            if (DeleteDocument(document.Id))
-                            {
-                                backToWorkspaceMenu = true;
-                            }
-                            break;
-                        case "4":
-                            ManageDocumentVersions(document);
-                            break;
-                        case "0":
-                            backToWorkspaceMenu = true;
-                            break;
-                        default:
-                            Console.WriteLine("Menu tidak valid. Silakan coba lagi.");
-                            break;
-                    }
-                }
-                
+
                 if (!backToWorkspaceMenu)
                 {
                     Console.WriteLine("\nTekan tombol apa saja untuk melanjutkan...");
@@ -720,9 +755,10 @@ namespace PaperNest_API.View
                 }
             }
         }
-        
+
+        // Dikasih null checking (?) karena area input (pemanggilan kode di atas) berpotensi nilai null.
         // Method untuk mengedit metadata dokumen (judul, deskripsi, status)
-        private void EditDocumentMetadata(Document document)
+        private void EditDocumentMetadata(Document? document)
         {
             if (document == null)
             {
@@ -765,7 +801,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk mengedit konten dokumen
-        private void EditDocumentContent(Document document)
+        private void EditDocumentContent(Document? document)
         {
             if (document == null)
             {
@@ -834,7 +870,7 @@ namespace PaperNest_API.View
         }
 
         // Method untuk manajemen versi dokumen
-        private void ManageDocumentVersions(Document document)
+        private void ManageDocumentVersions(Document? document)
         {
             if (document == null)
             {
@@ -986,7 +1022,7 @@ namespace PaperNest_API.View
             int index = 1;
             foreach (var version in versions)
             {
-                Console.WriteLine($"{index}. Versi dari {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+                Console.WriteLine($"{index}. Versi dari {version.Created_at:dd/MM/yyyy HH:mm:ss}"); // setara dengan 'version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
                 Console.WriteLine($"   {(version.IsCurrentVersion ? "[AKTIF]" : "")}");
                 Console.WriteLine($"   Deskripsi: {version.VersionDescription}");
                 // Tampilkan preview konten (maksimal 50 karakter)
@@ -1016,7 +1052,7 @@ namespace PaperNest_API.View
             }
             
             Console.WriteLine($"\n=== Detail Versi {version.Id} ===");
-            Console.WriteLine($"Dibuat pada: {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
+            Console.WriteLine($"Dibuat pada: {version.Created_at:dd/MM/yyyy HH:mm:ss}"); // setara dengan 'version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")'
             Console.WriteLine($"Status: {(version.IsCurrentVersion ? "Aktif" : "Tidak Aktif")}");
             Console.WriteLine($"Deskripsi: {version.VersionDescription}");
             Console.WriteLine("\nKonten:");
@@ -1090,7 +1126,106 @@ namespace PaperNest_API.View
                 }
             }
         }
-        
+
+        // Method to submit a document for review (the "push" action)
+        private void SubmitDocumentForReview(Document? document)
+        {
+            if (_currentUser == null)
+            {
+                Console.WriteLine("Anda harus login terlebih dahulu.");
+                return;
+            }
+            if (document == null)
+            {
+                Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                return;
+            }
+
+            Console.WriteLine($"\n=== Ajukan Dokumen untuk Review: {document.Title} ===");
+            Console.WriteLine("Dokumen akan diajukan dengan konten draft saat ini (jika ada) atau konten aktif.");
+
+            Console.Write("Judul Pengajuan (kosongkan untuk menggunakan judul dokumen): ");
+            string? submissionTitle = Console.ReadLine();
+
+            Console.Write("Abstrak Pengajuan: ");
+            string? submissionAbstract = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(submissionAbstract))
+            {
+                Console.WriteLine("Abstrak pengajuan tidak boleh kosong.");
+                return;
+            }
+
+            var submissionDto = new ResearchRequestSubmissionDto
+            {
+                UserId = _currentUser.Id,
+                Title = string.IsNullOrWhiteSpace(submissionTitle) ? document.Title : submissionTitle,
+                AbstractText = submissionAbstract
+            };
+
+            var result = _documentController.SubmitDocumentForReview(document.Id, submissionDto);
+
+            if (result is CreatedAtActionResult createdResult)
+            {
+                dynamic? resultData = createdResult.Value;
+                Console.WriteLine($"Dokumen berhasil diajukan untuk review! Request ID: {resultData?.Id}");
+            }
+            else if (result is ObjectResult errorResult)
+            {
+                dynamic? errorData = errorResult.Value;
+                Console.WriteLine($"Gagal mengajukan dokumen untuk review: {errorData?.message}");
+            }
+            else
+            {
+                Console.WriteLine("Gagal mengajukan dokumen untuk review.");
+            }
+        }
+
+        // Method to view review requests (for lecturers)
+        private void ViewReviewRequests()
+        {
+            if (_currentUser == null || _currentUser.Role != "Dosen")
+            {
+                Console.WriteLine("Anda harus login sebagai dosen untuk melihat permintaan review.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Daftar Permintaan Review ===");
+
+            var result = _researchRequestController.GetAllRequests(); // Get all requests
+
+            List<ResearchRequest>? requests = null;
+            if (result is OkObjectResult okResult && okResult.Value is { } value && value.GetType().GetProperty("data")?.GetValue(value) is List<ResearchRequest> requestList)
+            {
+                requests = [.. requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState)]; // Setara dengan ' requestList.Where(r => r.State is SubmittedState || r.State is UnderReviewState || r.State is NeedsRevisionState).ToList()'
+            }
+
+            if (requests == null || !requests.Any())
+            {
+                Console.WriteLine("Tidak ada permintaan review aktif.");
+                return;
+            }
+
+            int index = 1;
+            foreach (var req in requests)
+            {
+                Console.WriteLine($"{index}. Judul: {req.Title}");
+                Console.WriteLine($"   Peneliti: {req.ResearcherName}");
+                Console.WriteLine($"   Tanggal Pengajuan: {req.SubmissionDate.ToShortDateString()}");
+                Console.WriteLine($"   Keadaan: {req.State.Name}");
+                Console.WriteLine($"   ID Permintaan: {req.Id}");
+                Console.WriteLine();
+                index++;
+            }
+
+            Console.Write("Pilih permintaan review (nomor) untuk diproses atau 0 untuk kembali: ");
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= requests.Count())
+            {
+                var selectedRequest = requests.ElementAt(choice - 1);
+                ProcessReviewRequest(selectedRequest);
+            }
+        }
+
         // Method untuk mengedit workspace
         private void EditWorkspace()
         {
@@ -1169,7 +1304,66 @@ namespace PaperNest_API.View
                 return false;
             }
         }
-        
+
+        private void GenerateCitation(Document document)
+        {
+            if (document == null)
+            {
+                Console.WriteLine("Tidak ada dokumen yang dipilih.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Generate Citation ===");
+            Console.WriteLine("1. Tampilkan Sitasi");
+            Console.WriteLine("2. Tampilkan Bibliografi");
+            Console.WriteLine("3. Tampilkan Sitasi Text");
+            Console.Write("Pilih jenis format sitasi: ");
+
+            string? choice = Console.ReadLine();
+
+            if(_currentUser == null)
+            {
+                Console.WriteLine("Anda harus login terlebih dahulu.");
+                return;
+            }
+
+            var citation = new Citation(123, CitationType.JournalArticle, document.Title, author: _currentUser.Name, publicationInfo: ""); // Replace with actual publication info
+            /*
+             {
+                Id = 123,
+                Type = CitationType.JournalArticle,
+                Title = document.Title,
+                Author = _currentUser.Name,  // Replace with actual author logic
+                PublicationInfo = "Jurnal Ilmiah XYZ, Vol. 10, No. 1, pp. 45-60, 2023", // Make dynamic
+                PublicationDate = DateTime.Now, // Make dynamic
+                AccessDate = "2024-07-24", // Make dynamic
+                DOI = "10.1234/xyz.12345" // Make dynamic
+            };
+            */
+            var bibliography = new List<string>
+            {
+                $"{citation.Author}. ({citation.PublicationDate?.Year}). {citation.Title}. {citation.PublicationInfo}.",
+                 // Add more bibliography entries as needed.
+            };
+            string citationText = $"{citation.Author} ({citation.PublicationDate?.Year}). {citation.Title}."; // Example, remove page section because it's non-existent
+
+            switch (choice)
+            {
+                case "1":
+                    _citationView.DisplayCitation(citation);
+                    break;
+                case "2":
+                    _citationView.DisplayBibliography(bibliography);
+                    break;
+                case "3":
+                    _citationView.DisplayCitationText(citationText);
+                    break;
+                default:
+                    Console.WriteLine("Pilihan tidak valid.");
+                    break;
+            }
+        }
+
         // Method untuk menghapus dokumen
         private bool DeleteDocument(Guid documentId)
         {
@@ -1385,27 +1579,70 @@ namespace PaperNest_API.View
         private void ViewPendingReviews()
         {
             Console.WriteLine("\n=== Permintaan Review Tertunda ===");
-            
+
+            // In a real application, you'd use Dependency Injection for the controller.
+            // For this console app context, instantiating directly is acceptable for demo.
             var controller = new ResearchRequestController();
-            var pendingReviews = controller.GetRequestsByLecturer(_currentUser.Id);
-            
-            if (pendingReviews.Count == 0)
+
+            if (_currentUser == null || _currentUser.Role != "Dosen")
+            {
+                Console.WriteLine("Anda harus login sebagai dosen untuk melihat permintaan review.");
+                return;
+            }
+
+            // Call the controller method and cast the result to OkObjectResult to access the Value
+            var actionResult = controller.GetRequestsByLecturer(_currentUser.Id);
+            List<ResearchRequest>? pendingRequests = null;
+
+            if (actionResult is OkObjectResult okResult)
+            {
+                // Assuming the 'data' property holds the list of ResearchRequest
+                // You might need to cast okResult.Value to an anonymous type or dictionary
+                // to access 'data', or define a specific response DTO for the controller.
+                // For simplicity, let's assume 'data' is directly accessible from the anonymous object.
+                if(okResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+
+                dynamic responseData = okResult.Value;
+                pendingRequests = responseData.data as List<ResearchRequest>;
+            }
+            else if (actionResult is NotFoundObjectResult notFoundResult)
+            {
+                if(notFoundResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+
+                Console.WriteLine(notFoundResult.Value.GetType().GetProperty("message")?.GetValue(notFoundResult.Value));
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Terjadi kesalahan saat mengambil permintaan review.");
+                return;
+            }
+
+            if (pendingRequests == null || pendingRequests.Count == 0)
             {
                 Console.WriteLine("Tidak ada permintaan review tertunda.");
                 return;
             }
-            
-            foreach (var request in pendingReviews)
+
+            foreach (var request in pendingRequests)
             {
                 Console.WriteLine($"ID: {request.Id} | Judul: {request.Title} | Peneliti: {request.ResearcherName} | Status: {request.State.Name}");
             }
-            
+
             Console.Write("\nMasukkan ID permintaan untuk melihat detail (kosongkan untuk kembali): ");
             string? input = Console.ReadLine();
-            
+
             if (!string.IsNullOrEmpty(input) && Guid.TryParse(input, out Guid requestId))
             {
-                var selectedRequest = pendingReviews.FirstOrDefault(r => r.Id == requestId);
+                var selectedRequest = pendingRequests.FirstOrDefault(r => r.Id == requestId);
                 if (selectedRequest != null)
                 {
                     DisplayRequestDetails(selectedRequest);
@@ -1420,25 +1657,46 @@ namespace PaperNest_API.View
         private void ManageReviews()
         {
             Console.WriteLine("\n=== Kelola Review ===");
-            
+
             var controller = new ResearchRequestController();
-            var pendingReviews = controller.GetRequestsByLecturer(_currentUser.Id);
-            
-            if (pendingReviews.Count == 0)
+
+            // Call the controller method and extract data similarly
+            var actionResult = controller.GetRequestsByLecturer(_currentUser.Id);
+            List<ResearchRequest>? pendingReviews = null;
+
+            if (actionResult is OkObjectResult okResult)
+            {
+                if(okResult.Value == null)
+                {
+                    Console.WriteLine("Tidak ada data yang diterima.");
+                    return;
+                }
+                
+                // Assuming the 'data' property holds the list of ResearchRequest
+                dynamic responseData = okResult.Value;
+                pendingReviews = responseData.data as List<ResearchRequest>;
+            }
+            else
+            {
+                Console.WriteLine("Tidak dapat mengambil daftar permintaan review. Pastikan Anda login sebagai dosen.");
+                return;
+            }
+
+            if (pendingReviews == null || pendingReviews.Count == 0)
             {
                 Console.WriteLine("Tidak ada permintaan review tertunda.");
                 return;
             }
-            
+
             Console.WriteLine("Permintaan review yang tersedia:");
             foreach (var request in pendingReviews)
             {
                 Console.WriteLine($"ID: {request.Id} | Judul: {request.Title} | Peneliti: {request.ResearcherName} | Status: {request.State.Name}");
             }
-            
+
             Console.Write("\nMasukkan ID permintaan untuk mengelola review (kosongkan untuk kembali): ");
             string? input = Console.ReadLine();
-            
+
             if (!string.IsNullOrEmpty(input) && Guid.TryParse(input, out Guid requestId))
             {
                 var selectedRequest = pendingReviews.FirstOrDefault(r => r.Id == requestId);
@@ -1457,19 +1715,48 @@ namespace PaperNest_API.View
         {
             Console.WriteLine($"\n=== Proses Review untuk '{request.Title}' ===");
             Console.WriteLine($"Status saat ini: {request.State.Name}");
-            
+
+            var controller = new ResearchRequestController(); // Controller instance for calls
+
             if (request.State is SubmittedState)
             {
                 Console.WriteLine("1. Mulai review");
                 Console.WriteLine("0. Kembali");
-                
+
                 Console.Write("Pilihan: ");
                 string? choice = Console.ReadLine();
-                
+
                 if (choice == "1")
                 {
-                    var controller = new ResearchRequestController();
-                    controller.StartReview(request.Id);
+                    var actionResult = controller.StartReview(request.Id);
+                    if (actionResult is OkObjectResult okResult)
+                    {
+                        if(okResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the success message
+                        dynamic responseData = okResult.Value;
+                        Console.WriteLine(responseData?.message); // Print success message from API
+                    }
+                    else if (actionResult is BadRequestObjectResult badRequestResult)
+                    {
+                        if(badRequestResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the error message
+                        dynamic errorData = badRequestResult.Value;
+                        Console.WriteLine(errorData?.message); // Print error message from API
+                    }
+                    else
+                    {
+                        Console.WriteLine("Gagal memulai review. Terjadi kesalahan tak terduga.");
+                    }
                 }
             }
             else if (request.State is UnderReviewState || request.State is NeedsRevisionState)
@@ -1478,17 +1765,17 @@ namespace PaperNest_API.View
                 Console.WriteLine("2. Perlu revisi");
                 Console.WriteLine("3. Tolak");
                 Console.WriteLine("0. Kembali");
-                
+
                 Console.Write("Pilihan: ");
                 string? choice = Console.ReadLine();
-                
+
                 if (choice == "1" || choice == "2" || choice == "3")
                 {
                     Console.Write("Masukkan komentar: ");
                     string? comment = Console.ReadLine() ?? "";
-                    
-                    ReviewResult result = ReviewResult.Approved;
-                    
+
+                    ReviewResult result = ReviewResult.Pending; // Logika untuk menentukan hasil review, nilai default karena isi dari if-else
+
                     switch (choice)
                     {
                         case "1":
@@ -1501,9 +1788,62 @@ namespace PaperNest_API.View
                             result = ReviewResult.Rejected;
                             break;
                     }
-                    
-                    var controller = new ResearchRequestController();
-                    controller.ProcessReview(request.Id, result, _currentUser.Id, comment);
+
+                    if(_currentUser == null)
+                    {
+                        Console.WriteLine("Pengguna tidak ditemukan.");
+                        return;
+                    }
+
+                    // Create the DTO for ProcessReview
+                    var reviewDto = new ProcessReviewDto
+                    {
+                        ReviewerId = _currentUser.Id,
+                        Result = result,
+                        ReviewerComment = comment
+                    };
+
+                    var actionResult = controller.ProcessReview(request.Id, reviewDto);
+                    if (actionResult is OkObjectResult okResult)
+                    {
+                        if(okResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the success message
+                        dynamic responseData = okResult.Value;
+                        Console.WriteLine(responseData?.message); // Print success message from API
+                    }
+                    else if (actionResult is BadRequestObjectResult badRequestResult)
+                    {
+                        if (badRequestResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+                        
+                        // Assuming the 'message' property holds the error message
+                        dynamic errorData = badRequestResult.Value;
+                        Console.WriteLine(errorData?.message); // Print error message from API
+                    }
+                    else if (actionResult is NotFoundObjectResult notFoundResult)
+                    {
+                        if (notFoundResult.Value == null)
+                        {
+                            Console.WriteLine("Tidak ada data yang diterima.");
+                            return;
+                        }
+
+                        // Assuming the 'message' property holds the error message
+                        dynamic errorData = notFoundResult.Value;
+                        Console.WriteLine(errorData?.message); // Print error message from API
+                    }
+                    else
+                    {
+                        Console.WriteLine("Gagal memproses review. Terjadi kesalahan tak terduga.");
+                    }
                 }
             }
             else
@@ -1683,21 +2023,35 @@ namespace PaperNest_API.View
                 Console.WriteLine("Versi tidak ditemukan.");
                 return;
             }
-            
+
             Console.WriteLine($"\n=== Review Versi {version.Id} ===");
             Console.WriteLine($"Dibuat pada: {version.Created_at.ToString("dd/MM/yyyy HH:mm:ss")}");
             Console.WriteLine($"Status: {(version.IsCurrentVersion ? "Aktif" : "Tidak Aktif")}");
             Console.WriteLine($"Deskripsi: {version.VersionDescription}");
             Console.WriteLine("\nKonten:");
             Console.WriteLine(version.Content);
-            
-            // Jika sudah direview sebelumnya, tampilkan informasi review
+
+            // If already reviewed, display review information
             if (version.IsReviewed && version.ReviewId != Guid.Empty)
             {
                 Console.WriteLine("\nDokumen ini sudah direview sebelumnya.");
-                Console.WriteLine($"Hasil review: {version.ReviewResult}");
-                // TO DO: Tambahkan kode untuk menampilkan detail review jika diperlukan
-                
+                // We need to fetch the review details from the ReviewService (or ResearchRequestManager)
+                // assuming ReviewService has a GetReviewById method.
+                var reviewService = new ReviewService(); // Instantiate the ReviewService
+                var existingReview = reviewService.GetReviewById(version.ReviewId);
+
+                if (existingReview != null)
+                {
+                    Console.WriteLine($"Hasil review: {existingReview.Result}");
+                    Console.WriteLine($"Komentar: {existingReview.Comment}");
+                    Console.WriteLine($"Direview oleh: {existingReview.ReviewerName}");
+                    Console.WriteLine($"Pada: {existingReview.ReviewDate:dd/MM/yyyy HH:mm:ss}"); // Setara dengan 'existingReview.ReviewDate.ToString("dd/MM/yyyy HH:mm:ss")'
+                }
+                else
+                {
+                    Console.WriteLine($"Hasil review: {version.ReviewResult}"); // Fallback to DocumentBody's stored result
+                }
+
                 Console.WriteLine("\nApakah Anda ingin membuat review baru? (y/n): ");
                 string? choice = Console.ReadLine()?.ToLower();
                 if (choice != "y")
@@ -1705,22 +2059,22 @@ namespace PaperNest_API.View
                     return;
                 }
             }
-            
+
             Console.WriteLine("\n=== Buat Review ===");
             Console.WriteLine("1. Setujui (Approve)");
             Console.WriteLine("2. Perlu Revisi (Needs Revision)");
             Console.WriteLine("3. Tolak (Reject)");
             Console.WriteLine("0. Kembali tanpa Review");
-            
+
             Console.Write("Pilihan: ");
             string? reviewChoice = Console.ReadLine();
-            
+
             if (reviewChoice == "0")
             {
                 return;
             }
-            
-            // Tentukan result berdasarkan pilihan
+
+            // Determine result based on choice
             ReviewResult result;
             switch (reviewChoice)
             {
@@ -1737,61 +2091,148 @@ namespace PaperNest_API.View
                     Console.WriteLine("Pilihan tidak valid.");
                     return;
             }
-            
+
             Console.Write("Masukkan komentar untuk review: ");
             string comment = Console.ReadLine() ?? "";
-            
-            // Buat objek ResearchRequest jika belum ada
-            // Kita perlu membuat permintaan penelitian untuk versi ini
-            var document = DocumentBodyService.GetDocumentById(version.DocumentId);
+
+            // Get the associated Document for the DocumentBody
+            var document = DocumentService.GetById(version.DocumentId); // Assuming DocumentService.GetById is the correct method
             if (document == null)
             {
-                Console.WriteLine("Dokumen tidak ditemukan.");
+                Console.WriteLine("Dokumen utama tidak ditemukan untuk versi ini.");
                 return;
             }
-            
-            // Cek apakah sudah ada research request untuk dokumen ini
+
             var researchRequestController = new ResearchRequestController();
-            var allRequests = researchRequestController.GetAllRequests();
-            var existingRequest = allRequests.FirstOrDefault(r => r.DocumentBodyId == version.Id);
-            
             Guid requestId;
-            
+            ResearchRequest? existingRequest = null;
+
+            // To check for an existing research request, we need to call GetAllRequests and extract the data
+            var allRequestsResult = researchRequestController.GetAllRequests();
+            if (allRequestsResult is OkObjectResult okAllRequestsResult)
+            {
+                dynamic allRequestsData = okAllRequestsResult.Value;
+                List<ResearchRequest>? allRequests = allRequestsData.data as List<ResearchRequest>;
+                if (allRequests != null)
+                {
+                    // Find existing request for this DocumentBody.Id (version.Id)
+                    existingRequest = allRequests.FirstOrDefault(r => r.DocumentBodyId == version.Id);
+                }
+            }
+
             if (existingRequest == null)
             {
-                // Buat research request baru
-                string title = $"Review untuk {document.Title} - {version.VersionDescription}";
-                string abstractText = $"Review dokumen versi dari {version.Created_at}";
-                string researcherName = document.User?.Name ?? "Unknown";
-                
-                // Tambahkan request
-                researchRequestController.AddRequest(title, abstractText, researcherName, document.User_id, version.Id);
-                
-                // Dapatkan ID request yang baru dibuat
-                var newRequests = researchRequestController.GetAllRequests();
-                var newRequest = newRequests.LastOrDefault();
-                if (newRequest == null)
+                Console.WriteLine("Membuat permintaan review baru...");
+                // Create a new ResearchRequestDto to send to the API
+                var newRequestDto = new ResearchRequestDto
                 {
-                    Console.WriteLine("Gagal membuat permintaan review.");
+                    Title = $"Review for {document.Title} - {version.VersionDescription}",
+                    AbstractText = $"Review document version from {version.Created_at}",
+                    ResearcherName = document.User?.Name ?? "Unknown", // Assuming document.User is available
+                    UserId = document.User_id,
+                    DocumentId = document.Id,
+                    DocumentBodyId = version.Id
+                };
+
+                // Call the AddRequest method on the controller and handle its IActionResult
+                var addRequestResult = researchRequestController.AddRequest(newRequestDto);
+                if (addRequestResult is CreatedAtActionResult createdResult)
+                {
+                    dynamic createdData = createdResult.Value;
+                    ResearchRequest createdRequest = createdData.data; // Assuming 'data' contains the created ResearchRequest
+                    requestId = createdRequest.Id;
+                    Console.WriteLine($"Permintaan review baru berhasil dibuat dengan ID: {requestId}");
+                }
+                else if (addRequestResult is BadRequestObjectResult badRequest)
+                {
+                    dynamic errorData = badRequest.Value;
+                    Console.WriteLine($"Gagal membuat permintaan review: {errorData.message}");
                     return;
                 }
-                
-                requestId = newRequest.Id;
+                else
+                {
+                    Console.WriteLine("Gagal membuat permintaan review. Terjadi kesalahan tak terduga.");
+                    return;
+                }
             }
             else
             {
                 requestId = existingRequest.Id;
+                Console.WriteLine($"Menggunakan permintaan review yang sudah ada dengan ID: {requestId}");
             }
-            
-            // Mulai review
-            researchRequestController.StartReview(requestId);
-            
-            // Proses review
-            researchRequestController.ProcessReview(requestId, result, _currentUser.Id, comment);
-            
-            // Update ReviewId di DocumentBody
-            var success = DocumentBodyService.MarkVersionAsReviewed(version.Id, requestId, result);
-            
+
+            // Start review if the request is in the Submitted state
+            var currentRequestState = researchRequestController.GetRequestById(requestId);
+            if (currentRequestState is OkObjectResult okCurrentRequest)
+            {
+                dynamic requestData = okCurrentRequest.Value;
+                ResearchRequest req = requestData.data;
+
+                if (req.State is SubmittedState)
+                {
+                    Console.WriteLine("Memulai proses review...");
+                    var startReviewResult = researchRequestController.StartReview(requestId);
+                    if (startReviewResult is OkObjectResult okStartReview)
+                    {
+                        dynamic startReviewData = okStartReview.Value;
+                        Console.WriteLine(startReviewData.message);
+                    }
+                    else if (startReviewResult is BadRequestObjectResult badRequest)
+                    {
+                        dynamic errorData = badRequest.Value;
+                        Console.WriteLine($"Gagal memulai review: {errorData.message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Permintaan review saat ini dalam keadaan '{req.State.Name}'. Melewatkan langkah 'mulai review'.");
+                }
+            }
+
+
+            // Process review
+            Console.WriteLine("Memproses review...");
+            var processReviewDto = new ProcessReviewDto
+            {
+                ReviewerId = _currentUser.Id, // Assuming _currentUser is available and has an Id
+                Result = result,
+                ReviewerComment = comment
+            };
+            var processReviewResult = researchRequestController.ProcessReview(requestId, processReviewDto);
+
+            if (processReviewResult is OkObjectResult okProcessResult)
+            {
+                dynamic processData = okProcessResult.Value;
+                Console.WriteLine(processData.message);
+            }
+            else if (processReviewResult is BadRequestObjectResult badRequestProcess)
+            {
+                dynamic errorData = badRequestProcess.Value;
+                Console.WriteLine($"Gagal memproses review: {errorData.message}");
+                return;
+            }
+            else if (processReviewResult is NotFoundObjectResult notFoundProcess)
+            {
+                dynamic errorData = notFoundProcess.Value;
+                Console.WriteLine($"Gagal memproses review: {errorData.message}");
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Gagal memproses review. Terjadi kesalahan tak terduga.");
+                return;
+            }
+
+            // Update ReviewId in DocumentBody
+            // Assuming DocumentBodyService.MarkVersionAsReviewed needs the actual Review ID and Result
+            // The Review ID should ideally come from the Review object created by the AddReview in the ReviewService
+            // For now, let's assume it gets the requestId and the result from the ProcessReview.
+            // However, the current API doesn't return the Review object upon process, so you might need to fetch it
+            // or rely on ReviewService to manage this internal link.
+
+            // Let's assume for simplicity, the ReviewService.MarkVersionAsReviewed can work with the existing requestId and result.
+            var success = DocumentBodyService.MarkVersionAsReviewed(version.Id, requestId, result); // Assuming requestId is now the ReviewId
+
             if (success)
             {
                 Console.WriteLine("\nReview berhasil disimpan!");

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PaperNest_API.Models;
 using PaperNest_API.Services;
 
@@ -55,7 +55,7 @@ namespace PaperNest_API.Controllers
             });
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public IActionResult DeleteUser(Guid id)
         {
             UserService.Delete(id);
