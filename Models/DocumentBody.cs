@@ -29,7 +29,7 @@ namespace PaperNest_API.Models
         public virtual Document Document { get; set; } = null!;
 
         // Constructor for EF
-        protected DocumentBody() { }
+        public DocumentBody() { }
 
         public DocumentBody(string content, Guid documentId, string? versionDescription = null)
         {

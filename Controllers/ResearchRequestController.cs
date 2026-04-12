@@ -193,7 +193,7 @@ namespace PaperNest_API.Controllers
                 return BadRequest(new { message = $"Konten dokumen (DocumentBody) dengan ID {newRequestDto.DocumentBodyId} tidak valid untuk dokumen ini." });
             }
 
-            if(string.IsNullOrWhiteSpace(newRequestDto.Title) || string.IsNullOrWhiteSpace(newRequestDto.AbstractText) || string.IsNullOrWhiteSpace(newRequestDto.ResearcherName)
+            if(string.IsNullOrWhiteSpace(newRequestDto.Title) || string.IsNullOrWhiteSpace(newRequestDto.AbstractText) || string.IsNullOrWhiteSpace(newRequestDto.ResearcherName))
             {
                 return BadRequest(new { message = "Judul, abstrak, dan nama mahasiswa tidak boleh kosong." });
             }

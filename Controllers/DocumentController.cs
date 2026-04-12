@@ -331,4 +331,5 @@ namespace PaperNest_API.Controllers
                 return BadRequest(new { message = "Permintaan pembaruan tidak valid. Mohon berikan data metadata atau konten yang sesuai." });
             }
         }
+    }
 }
